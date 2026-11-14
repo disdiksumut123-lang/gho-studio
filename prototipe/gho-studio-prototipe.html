@@ -633,27 +633,25 @@ V['fas-perancang'] = () => `
 window.rancang = () => {
   const j = document.getElementById('pj').value, k = document.getElementById('pk').value, n = document.getElementById('pp').value, g = document.getElementById('pn').value;
   const el = document.getElementById('rout'); el.classList.remove('faint'); document.getElementById('ract').hidden = true;
-  aiThinking(el, 900, () => stream(el,
-`JUDUL: ${j} — "Antrean yang Tak Kunjung Usai"
-KELAS: ${k}
-
-INSTRUKSI UNTUK PESERTA
-Bacalah situasi awal. Jawab dengan keputusan dan alasanmu. Setelah setiap jawaban, kondisi akan berubah sebagai akibat dari keputusanmu. Ada ${n} putaran.
-
-SITUASI AWAL
-Puskesmas dengan 60 pasien per pagi, waktu tunggu 75 menit, 12 keluhan per minggu.
-
-JENIS PERUBAHAN KONDISI
-1) SDM berkurang mendadak  2) Isu viral di media sosial  3) Tanpa anggaran tambahan  4) Gangguan sistem  5) Kelompok rentan terdampak
-
-RUBRIK (skor 0–100)
-• Ketepatan analisis masalah (25%)
-• Kemampuan beradaptasi terhadap perubahan (30%)
-• Perwujudan nilai BerAKHLAK (25%)
-• Dampak bagi pengguna layanan (20%)
-
-GAYA RESPON: ${g}
-BATAS: 150–400 kata per jawaban · disimpan per putaran`, () => document.getElementById('ract').hidden = false));
+  const sec = [
+    `<div style="font-size:16px;font-weight:800">${esc(j)} — "Antrean yang Tak Kunjung Usai"</div><div class="faint" style="font-size:12.5px;margin-top:2px">Kelas: ${esc(k)}</div>`,
+    `<div class="label" style="margin-top:14px">Instruksi untuk peserta</div><p style="margin-top:4px">Bacalah situasi awal. Jawab dengan keputusan dan alasanmu. Setelah setiap jawaban, kondisi akan berubah sebagai akibat dari keputusanmu. Ada ${esc(n)} putaran.</p>`,
+    `<div class="label" style="margin-top:14px">Situasi awal</div><p style="margin-top:4px">Puskesmas dengan 60 pasien per pagi, waktu tunggu 75 menit, 12 keluhan per minggu.</p>`,
+    `<div class="label" style="margin-top:14px">Jenis perubahan kondisi</div><ol style="margin:6px 0 0 18px;padding:0"><li>SDM berkurang mendadak</li><li>Isu viral di media sosial</li><li>Tanpa anggaran tambahan</li><li>Gangguan sistem</li><li>Kelompok rentan terdampak</li></ol>`,
+    `<div class="label" style="margin-top:14px">Rubrik (skor 0–100)</div><ul style="margin:6px 0 0 18px;padding:0"><li>Ketepatan analisis masalah — <b>25%</b></li><li>Kemampuan beradaptasi terhadap perubahan — <b>30%</b></li><li>Perwujudan nilai BerAKHLAK — <b>25%</b></li><li>Dampak bagi pengguna layanan — <b>20%</b></li></ul>`,
+    `<div class="faint" style="font-size:12.5px;margin-top:14px;border-top:1px solid var(--line);padding-top:8px">Gaya respon: ${esc(g)} · Batas 150–400 kata per jawaban, disimpan tiap putaran.</div>`,
+  ];
+  aiThinking(el, 900, () => {
+    el.innerHTML = '';
+    let i = 0;
+    const next = () => {
+      if (i >= sec.length) { document.getElementById('ract').hidden = false; return; }
+      const d = document.createElement('div'); d.innerHTML = sec[i]; d.style.cssText = 'opacity:0;transition:opacity .25s';
+      el.appendChild(d); requestAnimationFrame(() => d.style.opacity = 1);
+      i++; setTimeout(next, reduce ? 0 : 200);
+    };
+    next();
+  });
 };
 
 V['fas-aktivitas'] = () => `
