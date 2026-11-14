@@ -29,7 +29,7 @@
         <div class="field"><label>{{ __('Minimal detik per halaman') }}</label><input type="number" min="0" name="cfg[seconds_per_page]" value="{{ $c('seconds_per_page', 20) }}"></div></div>
     </div>
 
-    <div class="card stack cfg" data-for="tugas refleksi studi_kasus">
+    <div class="card stack cfg" data-for="tugas refleksi studi_kasus formulir">
       <h3>{{ __('Penilaian') }}</h3>
       <div class="field"><label>{{ __('Rubrik (satu kriteria per baris, dengan bobot)') }}</label><textarea name="cfg[rubric]" placeholder="{{ __('Ketepatan isi 40%') }}">{{ $c('rubric') }}</textarea></div>
       <div class="grid g2" data-for="tugas refleksi"><div class="field"><label>{{ __('Minimal karakter jawaban') }}</label><input type="number" min="0" name="cfg[min_chars]" value="{{ $c('min_chars', 0) }}"></div></div>
@@ -46,6 +46,42 @@
       <div class="field"><label>{{ __('Pertanyaan pertama') }}</label><input type="text" name="cfg[opening_question]" value="{{ $c('opening_question') }}"></div>
     </div>
 
+
+    <div class="card stack cfg" data-for="formulir">
+      @php $P = \App\Support\Page::class; $pg = array_merge($P::defaults(), (array) $a->cfg('page', [])); $fo = array_merge($P::fontDefaults(), (array) $a->cfg('fonts', [])); @endphp
+      <div class="row" style="justify-content:space-between"><h3>{{ __('Isian untuk peserta') }}</h3>
+        <span class="row"><select id="fbTpl" style="width:auto"><option value="">{{ __('Pakai templat…') }}</option>@foreach ($templates as $tp)<option value="{{ $tp->id }}">{{ $tp->name }}</option>@endforeach</select>
+          <button type="button" class="btn sm" id="fbSaveTpl">{{ __('Simpan sebagai templat') }}</button></span></div>
+      <p class="faint" style="font-size:12.5px">{{ __('Tambah, hapus, dan urutkan bagian serta isian. Setiap isian punya kode yang bisa dipakai di perintah output.') }}</p>
+      <div id="fbForm" class="stack"></div>
+      <div><button type="button" class="btn" id="fbAddSec">@ic('plus'){{ __('Bagian isian') }}</button></div>
+      <h3 style="margin-top:8px">{{ __('Output dokumen') }}</h3>
+      <p class="faint" style="font-size:12.5px">{{ __('Setiap bagian output disusun dari isian peserta sesuai perintahnya. Bagian bisa ditambah dan dihapus.') }}</p>
+      <div id="fbOut" class="stack"></div>
+      <div><button type="button" class="btn" id="fbAddOut">@ic('plus'){{ __('Bagian output') }}</button></div>
+      <div class="grid g2" style="margin-top:8px">
+        <div class="stack" id="fbPage"><h3>{{ __('Templat halaman') }}</h3>
+          <div class="grid g2" style="gap:8px">
+            <div class="field"><label>{{ __('Ukuran kertas') }}</label><select name="size">@foreach (array_keys($P::SIZES) as $sz)<option value="{{ $sz }}" @selected($pg['size'] === $sz)>{{ $sz === 'custom' ? __('Ukuran bebas') : $sz.($sz === 'F4' ? ' (Folio)' : '') }}</option>@endforeach</select></div>
+            <div class="field"><label>{{ __('Orientasi') }}</label><select name="orientation"><option value="portrait">{{ __('Tegak') }}</option><option value="landscape" @selected($pg['orientation'] === 'landscape')>{{ __('Mendatar') }}</option></select></div></div>
+          <div class="grid g2" style="gap:8px" id="fbCustom">
+            <div class="field"><label>{{ __('Lebar (mm)') }}</label><input type="number" name="width_mm" value="{{ $pg['width_mm'] }}"></div>
+            <div class="field"><label>{{ __('Tinggi (mm)') }}</label><input type="number" name="height_mm" value="{{ $pg['height_mm'] }}"></div></div>
+          <div class="grid g4" style="gap:6px">
+            @foreach (['top' => __('Atas'), 'right' => __('Kanan'), 'bottom' => __('Bawah'), 'left' => __('Kiri')] as $mk => $ml)
+              <div class="field"><label style="font-size:12px">{{ $ml }} (mm)</label><input type="number" min="0" name="m_{{ $mk }}" value="{{ $pg['margin'][$mk] ?? 25 }}"></div>@endforeach</div>
+          <div class="row"><div id="fbPv" style="background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);box-sizing:border-box"><div style="height:100%;border:1px dashed #cbd5e1;color:#94a3b8;font-size:9px;padding:3px">Aa</div></div><span class="faint mono" id="fbPvLbl"></span></div>
+        </div>
+        <div class="stack" id="fbFonts"><h3>{{ __('Huruf') }}</h3>
+          <div class="field"><label>{{ __('Huruf isian peserta') }}</label><div class="row" style="flex-wrap:nowrap"><select name="input_family">@foreach (array_keys($P::FONTS) as $fn)<option @selected($fo['input_family'] === $fn)>{{ $fn }}</option>@endforeach</select><input type="number" name="input_size" min="9" max="24" value="{{ $fo['input_size'] }}" style="width:80px"></div></div>
+          <div class="field"><label>{{ __('Huruf output') }}</label><div class="row" style="flex-wrap:nowrap"><select name="output_family">@foreach (array_keys($P::FONTS) as $fn)<option @selected($fo['output_family'] === $fn)>{{ $fn }}</option>@endforeach</select><input type="number" name="output_size" min="8" max="20" value="{{ $fo['output_size'] }}" style="width:80px"></div></div>
+          <div class="grid g2" style="gap:8px"><div class="field"><label>{{ __('Ukuran judul output') }}</label><input type="number" name="heading_size" min="8" max="28" value="{{ $fo['heading_size'] }}"></div>
+            <div class="field"><label>{{ __('Spasi baris') }}</label><select name="line_height">@foreach ([1, 1.15, 1.5, 2] as $lh)<option value="{{ $lh }}" @selected((float) $fo['line_height'] === (float) $lh)>{{ $lh }}</option>@endforeach</select></div></div>
+        </div>
+      </div>
+      <input type="hidden" name="cfg[form]" id="cfgForm"><input type="hidden" name="cfg[output]" id="cfgOutput"><input type="hidden" name="cfg[page]" id="cfgPage"><input type="hidden" name="cfg[fonts]" id="cfgFonts">
+      <label class="sw"><input type="checkbox" name="cfg[hold_feedback]" value="1" @checked($c('hold_feedback'))> {{ __('Dokumen ditinjau dulu sebelum dianggap selesai') }}</label>
+    </div>
     <div class="card stack cfg" data-for="kuis">
       <h3>{{ __('Kuis') }}</h3>
       <div class="grid g2"><div class="field"><label>{{ __('Batas lulus (0–100)') }}</label><input type="number" min="0" max="100" name="cfg[passing]" value="{{ $c('passing', 70) }}"></div></div>
@@ -95,6 +131,13 @@
 @endif
 
 @push('scripts')
+<script src="{{ asset('js/gho-form.js') }}?v=1"></script>
+<script>
+ghoFormBuilder.init({form: {{ \Illuminate\Support\Js::from($a->cfg('form', ['sections' => []])) }}, output: {{ \Illuminate\Support\Js::from($a->cfg('output', ['sections' => []])) }},
+  types: {{ \Illuminate\Support\Js::from(array_map('__', \App\Support\Page::FIELD_TYPES)) }}, sizes: {{ \Illuminate\Support\Js::from(\App\Support\Page::SIZES) }}, fonts: {{ \Illuminate\Support\Js::from(\App\Support\Page::FONTS) }},
+  templates: {{ \Illuminate\Support\Js::from($templates->map->only(['id', 'name', 'config'])) }}, tplUrl: {{ \Illuminate\Support\Js::from(route('fas.template.store')) }},
+  t: {replace: {{ \Illuminate\Support\Js::from(__('Ganti isian dan output dengan templat ini?')) }}, loaded: {{ \Illuminate\Support\Js::from(__('Templat dimuat. Periksa lalu simpan.')) }}, tplName: {{ \Illuminate\Support\Js::from(__('Nama templat:')) }}, tplSaved: {{ \Illuminate\Support\Js::from(__('Templat disimpan.')) }}}});
+</script>
 <script>
 (function(){
   const form = document.getElementById('actForm');

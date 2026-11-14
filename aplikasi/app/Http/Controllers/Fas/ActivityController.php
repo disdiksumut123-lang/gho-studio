@@ -16,7 +16,7 @@ class ActivityController extends Controller
     public function create(Request $r, Subject $subject)
     {
         $this->authorizeTraining($r->user(), $subject->agenda->training);
-        return view('fas.activity-form', ['subject' => $subject, 'a' => new Activity(['type' => $r->get('type', 'tugas'), 'sequential' => true, 'required' => true, 'config' => []])]);
+        return view('fas.activity-form', ['templates' => \App\Models\FormTemplate::orderBy('name')->get(), 'subject' => $subject, 'a' => new Activity(['type' => $r->get('type', 'tugas'), 'sequential' => true, 'required' => true, 'config' => []])]);
     }
 
     private function payload(Request $r): array
@@ -31,6 +31,7 @@ class ActivityController extends Controller
         $cfg = array_filter($r->input('cfg', []), fn ($v) => $v !== null && $v !== '');
         foreach (['rounds', 'passing', 'pages', 'seconds_per_page', 'min_chars'] as $n) if (isset($cfg[$n])) $cfg[$n] = (int) $cfg[$n];
         $cfg['hold_feedback'] = $r->boolean('cfg.hold_feedback');
+        foreach (['form', 'output', 'page', 'fonts'] as $j) if (isset($cfg[$j]) && is_string($cfg[$j])) $cfg[$j] = json_decode($cfg[$j], true) ?: [];
         return [
             'type' => $d['type'], 'title' => $d['title'], 'instructions' => Html::clean($d['instructions'] ?? ''),
             'opens_at' => $d['opens_at'] ?? null, 'closes_at' => $d['closes_at'] ?? null, 'config' => $cfg,
@@ -49,7 +50,7 @@ class ActivityController extends Controller
     public function edit(Request $r, Activity $activity)
     {
         $this->authorizeTraining($r->user(), $activity->training());
-        return view('fas.activity-form', ['subject' => $activity->subject, 'a' => $activity->load('questions')]);
+        return view('fas.activity-form', ['templates' => \App\Models\FormTemplate::orderBy('name')->get(), 'subject' => $activity->subject, 'a' => $activity->load('questions')]);
     }
 
     public function update(Request $r, Activity $activity)
@@ -93,6 +94,13 @@ class ActivityController extends Controller
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
+    }
+
+    public function saveTemplate(Request $r)
+    {
+        $d = $r->validate(['name' => 'required|max:160', 'config' => 'required|array']);
+        $t = \App\Models\FormTemplate::create(['name' => $d['name'], 'config' => $d['config'], 'created_by' => $r->user()->id]);
+        return response()->json(['id' => $t->id]);
     }
 
     public function design(Request $r)

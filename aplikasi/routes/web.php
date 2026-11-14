@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/aktivitas/{activity}/soal', [ActivityController::class, 'saveQuestions'])->name('activity.questions');
         Route::post('/aktivitas/{activity}/buat-soal', [ActivityController::class, 'generateQuiz'])->name('activity.genquiz');
         Route::post('/perancang', [ActivityController::class, 'design'])->name('design');
+        Route::post('/templat-formulir', [ActivityController::class, 'saveTemplate'])->name('template.store');
         Route::get('/jawaban', [CoachController::class, 'review'])->name('review');
     });
 

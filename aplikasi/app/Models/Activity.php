@@ -23,6 +23,7 @@ class Activity extends Model
         'refleksi' => ['Refleksi', 'chat'],
         'studi_kasus' => ['Studi kasus interaktif', 'chat'],
         'kuis' => ['Kuis', 'quiz'],
+        'formulir' => ['Formulir dan dokumen', 'file'],
     ];
 
     public function cfg(string $key, $default = null) { return data_get($this->config ?? [], $key, $default); }
