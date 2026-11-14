@@ -42,9 +42,30 @@ Gunakan file ini bila kuota satu langganan Claude habis dan pekerjaan dilanjutka
 - Tampilan mudah, kekinian, responsif; navigasi HP maksimal 4 menu + Lainnya.
 - Aplikasi lama yang diadopsi: coach.gho-elearning.com dan Coach Labs (coach-labs.gho-elearning.com). Kredensial tidak disimpan di repo; minta langsung ke pemilik produk bila perlu.
 
+## SEDANG DIKERJAKAN: isian dan output dinamis (permintaan 14 Nov, 11.15)
+Pemilik produk ingin isian rancangan TIDAK statis (contoh salah: "Identitas umum" dengan kolom tetap di prototipe). Belum ada kode untuk ini; mulai dari rancangan berikut.
+
+Permintaan:
+1. **Pembuat isian**: fasilitator/coach menambah, menghapus, mengurutkan bagian dan isian dengan jenis apa pun: teks pendek, paragraf (editor lengkap + persamaan), angka, tanggal, pilihan (dropdown/radio), centang banyak, tabel (kolom ditentukan, baris bisa ditambah peserta), unggah berkas.
+2. **Pembuat output**: bagian output bisa ditambah dan dihapus; tiap bagian punya perintah penyusunan yang merujuk isian, misalnya `{latar_belakang}`.
+3. **Templat output**: ukuran kertas A4, A5, F4/Folio, Letter, Legal, ukuran bebas (mm), orientasi, margin.
+4. **Huruf**: jenis dan ukuran huruf bisa diatur untuk isian dan untuk output.
+5. Berlaku untuk rancangan coach dan tugas lain yang cocok. Prototipe juga perlu diperbarui.
+
+Rancangan teknis yang disarankan:
+- Jenis aktivitas baru `formulir` di `Activity::TYPES` (nama tampil: "Formulir dan dokumen"). Skema disimpan di `activities.config`:
+  `form.sections[] = {key, title, help, fields[] = {key, label, type: text|textarea|number|date|select|radio|checkbox|table|file, required, options[], columns[], help}}`,
+  `output.sections[] = {key, title, prompt}`, `page = {size: A4|A5|F4|Letter|Legal|custom, width_mm, height_mm, orientation, margin_mm{top,right,bottom,left}}`,
+  `fonts = {input_family, input_size, output_family, output_size, heading_size}`.
+- Tabel baru `form_templates` (name, training_type, config json, created_by) agar skema bisa disimpan dan dipakai ulang; seeder templat: Rancangan Aktualisasi (Latsar), Aksi Perubahan (PKP/PKA), Proyek Perubahan (PKN II), Learning journal, Lesson learned (lihat bab 7 dan Lampiran B spesifikasi untuk bagian-bagiannya).
+- Tabel baru `documents` (activity_id, user_id, answer_id, sections json {key: html}, status draf/ditinjau/disetujui, updated_by). Jawaban isian disimpan di `answers` sebagai JSON (`item_key='form'`, simpan otomatis per versi seperti tugas).
+- Penyusunan output: satu panggilan `AiClient` per bagian output (agar tidak terpotong dan bisa diulang per bagian), prompt bagian diisi nilai isian. Simpan dulu jawaban, baru susun (pola yang sama dengan studi kasus).
+- Tampilan dokumen: halaman HTML dengan CSS `@page { size: <w>mm <h>mm; margin: ... }` dan huruf sesuai pengaturan, tombol Cetak/PDF lewat browser; coach bisa mengedit dan menyetujui per bagian.
+- Pembuat isian/output di `resources/views/fas/activity-form.blade.php` (kartu `.cfg[data-for=formulir]`) dengan JS mirip `ghoQuiz` di `public/js/gho.js`, hasilnya JSON di input tersembunyi `cfg[form]`, `cfg[output]` (ubah `ActivityController::payload` agar men-decode JSON ini).
+
 ## Langkah berikutnya
 - Programmer memasang di Hostinger sesuai panduan, pemilik produk mencoba.
-- Tahap 5: rancangan coach (Rancangan Aktualisasi, Aksi Perubahan, Proyek Perubahan) dengan cek mutu per bagian.
+- Selesaikan isian dan output dinamis di atas (termasuk templat rancangan coach dan cek mutu per bagian).
 - Fitur inovasi coach: sesi GROW, catatan tiga pihak, papan milestone + peringatan dini, kartu mentor, gladi seminar, peta pemangku kepentingan.
 - Kuis bentuk tambahan: berbasis gambar, PG beralasan, skala sikap, kuis langsung berwaktu.
 - Integrasi API resmi YouTube/Meta/TikTok untuk CMS.
