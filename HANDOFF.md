@@ -55,6 +55,12 @@ Gunakan file ini bila kuota satu langganan Claude habis dan pekerjaan dilanjutka
 - Prototipe: menu Coach › Pembuat formulir, dan Peserta › Rancangan memakai isian dinamis + halaman dokumen.
 - Belum: cek mutu otomatis per bagian isian (seperti Negasi-Fokus-Lokus) di aplikasi nyata; unduh Word (.docx).
 
+## Selesai: ukuran tampilan video dan eBook (14 Nov malam)
+- Permintaan pemilik produk: tautan video/eBook (YouTube, Heyzine) bisa diatur ukuran tampilannya, misalnya 1920x1080, dan bisa ukuran bebas.
+- `app/Support/Frame.php`: rasio siap pakai (16:9, 4:3, 1:1, 9:16, 21:9) atau "custom" dengan lebar/tinggi piksel sendiri. Disimpan di `activities.config.frame`.
+- Pembuat aktivitas: pilihan "Ukuran tampilan" pada kartu Media untuk jenis video dan eBook (`resources/views/fas/activity-form.blade.php`).
+- Peserta: kotak video/eBook memakai CSS `aspect-ratio` sesuai pilihan, lebar tetap menyesuaikan layar (`resources/views/pes/activity.blade.php`).
+
 ## Peta jalan
 Daftar lengkap inovasi berprioritas ada di `ROADMAP-INOVASI.md` (permintaan pemilik produk: selengkap-lengkapnya, untuk masa depan).
 

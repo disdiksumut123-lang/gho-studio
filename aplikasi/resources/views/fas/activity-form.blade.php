@@ -27,6 +27,17 @@
       <div class="grid g2" data-for="ebook">
         <div class="field"><label>{{ __('Jumlah halaman') }}</label><input type="number" min="1" name="cfg[pages]" value="{{ $c('pages', 10) }}"></div>
         <div class="field"><label>{{ __('Minimal detik per halaman') }}</label><input type="number" min="0" name="cfg[seconds_per_page]" value="{{ $c('seconds_per_page', 20) }}"></div></div>
+      @php $fr = array_merge(\App\Support\Frame::defaults(), (array) $a->cfg('frame', [])); $ratioLabels = ['16:9' => '16:9 (' . __('Layar lebar') . ')', '4:3' => '4:3', '1:1' => '1:1 (' . __('Persegi') . ')', '9:16' => '9:16 (' . __('Vertikal') . ')', '21:9' => '21:9 (' . __('Ultra-lebar') . ')', 'custom' => __('Ukuran sendiri (piksel)')]; @endphp
+      <div class="grid g2" data-for="video ebook">
+        <div class="field"><label>{{ __('Ukuran tampilan') }}</label>
+          <select id="frRatio" name="cfg[frame][ratio]">
+            @foreach ($ratioLabels as $rv => $rl)<option value="{{ $rv }}" @selected($fr['ratio'] === $rv)>{{ $rl }}</option>@endforeach
+          </select>
+          <span class="hint">{{ __('Lebar selalu menyesuaikan layar, tinggi mengikuti rasio ini. Pakai 1920x1080 untuk ukuran layar standar.') }}</span></div>
+        <div class="row" id="frCustom" @if($fr['ratio'] !== 'custom') hidden @endif>
+          <div class="field"><label>{{ __('Lebar (px)') }}</label><input type="number" min="1" name="cfg[frame][w]" value="{{ $fr['w'] }}"></div>
+          <div class="field"><label>{{ __('Tinggi (px)') }}</label><input type="number" min="1" name="cfg[frame][h]" value="{{ $fr['h'] }}"></div></div>
+      </div>
     </div>
 
     <div class="card stack cfg" data-for="tugas refleksi studi_kasus formulir">
@@ -151,6 +162,8 @@ ghoFormBuilder.init({form: {{ \Illuminate\Support\Js::from($a->cfg('form', ['sec
   const sync = () => { const v = (form.querySelector('[name=type]:checked')||{}).value;
     form.querySelectorAll('[data-for]').forEach(el => { el.hidden = !el.dataset.for.split(' ').includes(v); }); };
   form.querySelectorAll('[name=type]').forEach(r => r.addEventListener('change', sync)); sync();
+  const frRatio = document.getElementById('frRatio'), frCustom = document.getElementById('frCustom');
+  if (frRatio) { const syncFr = () => { frCustom.hidden = frRatio.value !== 'custom'; }; frRatio.addEventListener('change', syncFr); syncFr(); }
   window.ghoDesign = async () => {
     const type = (form.querySelector('[name=type]:checked')||{}).value, goal = form.title.value.trim();
     if (goal.length < 10) { ghoToast({{ \Illuminate\Support\Js::from(__('Tulis tujuan atau judul yang lebih jelas dulu (minimal 10 huruf).')) }}); return; }

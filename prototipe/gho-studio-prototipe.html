@@ -1505,15 +1505,19 @@ const MATERI = [
 ];
 const mDone = () => store.get('mDone', {});
 let mSel = null, mProg = {v:0, a:0, vmax:0, amax:0}, mIv = null, ePg = 1, eSeen = {1:true}, eTime = {};
+const MRATIOS = ['16:9','4:3','1:1','9:16','21:9'];
+const mRatio = () => store.get('mRatio', '16:9');
+window.mSetRatio = v => { store.set('mRatio', v); render(); };
 const unlocked = i => i===0 || MATERI.slice(0,i).every(m => mDone()[m.id]);
 V['pes-materi'] = () => { const d = mDone(); if(mSel===null){ mSel = MATERI.findIndex((m,i)=>!d[m.id]); if(mSel<0) mSel = 0; } const m = MATERI[mSel];
   clearInterval(mIv);
   let pane = '';
-  if(m.id==='v' || m.id==='a'){ const pct = mProg[m.id], mx = mProg[m.id+'max'];
-    pane = `<div class="player">${m.id==='v'?`<div class="screen">▶ ${m.judul}<br><span style="font-size:12px;font-weight:500;opacity:.7">Pemutar video (YouTube atau server sendiri)</span></div>`:`<div class="screen" style="aspect-ratio:auto;padding:28px">🎧 ${m.judul}</div>`}
+  if(m.id==='v' || m.id==='a'){ const pct = mProg[m.id], mx = mProg[m.id+'max']; const rt = mRatio();
+    pane = `<div class="player">${m.id==='v'?`<div class="screen" style="aspect-ratio:${rt}">▶ ${m.judul}<br><span style="font-size:12px;font-weight:500;opacity:.7">Pemutar video (YouTube atau server sendiri) · ${rt}</span></div>`:`<div class="screen" style="aspect-ratio:auto;padding:28px">🎧 ${m.judul}</div>`}
       <div class="ctl"><button onclick="mPlay('${m.id}')" aria-label="Putar atau jeda" id="mpb">${ic('play')}</button>
       <div class="seek" onclick="mSeek(event,'${m.id}')"><span class="mx" style="width:${mx}%"></span><span class="cur" id="mcur" style="width:${pct}%"></span></div>
-      <span class="mono" style="font-size:12px" id="mpct">${Math.round(pct)}%</span></div></div>`;
+      <span class="mono" style="font-size:12px" id="mpct">${Math.round(pct)}%</span></div></div>
+      ${m.id==='v'?`<div class="row" style="margin-top:8px;flex-wrap:nowrap;align-items:center;gap:8px"><span class="faint" style="font-size:12px">Ukuran tampilan (diatur fasilitator, simulasi):</span><select style="width:auto" onchange="mSetRatio(this.value)">${MRATIOS.map(r=>`<option ${r===rt?'selected':''}>${r}</option>`).join('')}</select></div>`:''}`;
   } else if(m.id==='e'){
     pane = `<div class="flip"><div class="row" style="justify-content:space-between;width:100%"><span class="chip ai">Flipbook Heyzine</span><span class="mono faint">Halaman ${ePg}/8 · dibuka ${Object.keys(eSeen).length}/8</span></div>
       <div class="pg"><b>${ePg===1?'Modul Agenda 2':'Bab '+(ePg-1)}</b>${'<i></i>'.repeat(9)}<i style="width:60%"></i></div>

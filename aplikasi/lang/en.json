@@ -643,5 +643,14 @@
     "Pilihan (daftar turun)": "Choice (dropdown)",
     "Pilihan (bulatan)": "Choice (radio)",
     "Centang banyak": "Multiple checkboxes",
-    "Unggah berkas": "File upload"
+    "Unggah berkas": "File upload",
+    "Ukuran tampilan": "Display size",
+    "Lebar selalu menyesuaikan layar, tinggi mengikuti rasio ini. Pakai 1920x1080 untuk ukuran layar standar.": "Width always fills the screen, height follows this ratio. Use 1920x1080 for a standard screen size.",
+    "Lebar (px)": "Width (px)",
+    "Tinggi (px)": "Height (px)",
+    "Layar lebar": "Widescreen",
+    "Persegi": "Square",
+    "Vertikal": "Vertical",
+    "Ultra-lebar": "Ultra-wide",
+    "Ukuran sendiri (piksel)": "Custom size (pixels)"
 }

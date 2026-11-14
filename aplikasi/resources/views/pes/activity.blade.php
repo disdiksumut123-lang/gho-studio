@@ -22,12 +22,12 @@
 
   @case('video')
   @case('audio')
-    @php $url = (string) $a->cfg('url'); preg_match('~(?:youtu\.be/|v=|embed/|shorts/)([A-Za-z0-9_-]{11})~', $url, $yt); @endphp
+    @php $url = (string) $a->cfg('url'); preg_match('~(?:youtu\.be/|v=|embed/|shorts/)([A-Za-z0-9_-]{11})~', $url, $yt); $frCss = \App\Support\Frame::css((array) $a->cfg('frame', [])); @endphp
     <div class="card stack" id="media" data-url="{{ route('pes.media', $a) }}" data-max="{{ $media->max_position ?? 0 }}">
       @if ($a->type === 'video' && ! empty($yt[1]))
-        <div class="frame" style="overflow:hidden"><div id="ytp" data-id="{{ $yt[1] }}"></div></div>
+        <div class="frame" style="overflow:hidden;aspect-ratio:{{ $frCss }}"><div id="ytp" data-id="{{ $yt[1] }}"></div></div>
       @elseif ($a->type === 'video')
-        <video id="mel" class="frame" controls controlslist="nodownload noplaybackrate" preload="metadata" src="{{ $url }}"></video>
+        <video id="mel" class="frame" style="aspect-ratio:{{ $frCss }}" controls controlslist="nodownload noplaybackrate" preload="metadata" src="{{ $url }}"></video>
       @else
         <audio id="mel" controls controlslist="nodownload noplaybackrate" preload="metadata" src="{{ $url }}" style="width:100%"></audio>
       @endif
@@ -37,9 +37,9 @@
     @break
 
   @case('ebook')
-    @php $need = (int) $a->cfg('pages', 0) * (int) $a->cfg('seconds_per_page', 20); @endphp
+    @php $need = (int) $a->cfg('pages', 0) * (int) $a->cfg('seconds_per_page', 20); $frCss = \App\Support\Frame::css((array) $a->cfg('frame', [])); @endphp
     <div class="card stack" id="ebook" data-url="{{ route('pes.media', $a) }}" data-need="{{ $need }}" data-have="{{ $media->active_seconds ?? 0 }}">
-      <iframe class="frame ebook" src="{{ $a->cfg('url') }}" allowfullscreen loading="lazy" title="{{ $a->title }}"></iframe>
+      <iframe class="frame ebook" style="aspect-ratio:{{ $frCss }};height:auto" src="{{ $a->cfg('url') }}" allowfullscreen loading="lazy" title="{{ $a->title }}"></iframe>
       <div class="row" style="flex-wrap:nowrap"><div class="bar" style="flex:1"><span id="ebar" style="width:0%"></span></div><span class="mono" id="etime"></span></div>
       <label class="sw"><input type="checkbox" id="elast" @checked($done)> {{ __('Saya sudah membaca sampai halaman terakhir') }}</label>
       <div class="faint" style="font-size:12.5px">@ic('lock', 'width:13px;height:13px;vertical-align:-2px') {{ __('Baca semua :p halaman. Waktu baca minimal dihitung hanya saat halaman ini terbuka.', ['p' => $a->cfg('pages', 0)]) }}</div>
