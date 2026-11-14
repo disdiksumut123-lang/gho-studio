@@ -1,6 +1,7 @@
 {{-- Editor teks lengkap. $id, $name, $html, $upload (bool), $save (url autosave atau null) --}}
 @php $upload = $upload ?? false; $save = $save ?? null; @endphp
-<div class="ed" id="{{ $id }}" data-name="{{ $name }}" @if ($save) data-save="{{ $save }}" @endif>
+@php $lim = $limits ?? []; @endphp
+<div class="ed" id="{{ $id }}" data-name="{{ $name }}" @if ($save) data-save="{{ $save }}" @endif data-paste="{{ ($lim['paste'] ?? true) ? 1 : 0 }}" data-maxchars="{{ $lim['chars'] ?? 0 }}" data-maxvoice="{{ $lim['voice'] ?? 60 }}">
   @if ($upload)
     <div class="tabs edmode"><button class="on" type="button" data-mode="ketik">@ic('pen', 'width:14px;height:14px;vertical-align:-2px') {{ __('Ketik langsung') }}</button><button type="button" data-mode="unggah">@ic('up', 'width:14px;height:14px;vertical-align:-2px') {{ __('Unggah dokumen') }}</button></div>
   @endif

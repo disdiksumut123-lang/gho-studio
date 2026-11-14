@@ -29,8 +29,10 @@ class ActivityController extends Controller
             'cfg' => 'array',
         ]);
         $cfg = array_filter($r->input('cfg', []), fn ($v) => $v !== null && $v !== '');
-        foreach (['rounds', 'passing', 'pages', 'seconds_per_page', 'min_chars'] as $n) if (isset($cfg[$n])) $cfg[$n] = (int) $cfg[$n];
+        if ($r->has('cfg.max_voice')) $cfg['max_voice'] = (int) $r->input('cfg.max_voice');
+        foreach (['rounds', 'passing', 'pages', 'seconds_per_page', 'min_chars', 'max_chars', 'max_voice'] as $n) if (isset($cfg[$n])) $cfg[$n] = (int) $cfg[$n];
         $cfg['hold_feedback'] = $r->boolean('cfg.hold_feedback');
+        $cfg['allow_paste'] = $r->boolean('cfg.allow_paste');
         foreach (['form', 'output', 'page', 'fonts'] as $j) if (isset($cfg[$j]) && is_string($cfg[$j])) $cfg[$j] = json_decode($cfg[$j], true) ?: [];
         return [
             'type' => $d['type'], 'title' => $d['title'], 'instructions' => Html::clean($d['instructions'] ?? ''),

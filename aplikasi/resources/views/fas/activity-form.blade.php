@@ -97,6 +97,13 @@
       <label class="sw"><input type="checkbox" name="required" value="1" @checked(old('required', $a->required ?? true))> {{ __('Wajib diselesaikan') }}</label>
       <label class="sw"><input type="checkbox" name="sequential" value="1" @checked(old('sequential', $a->sequential ?? true))> {{ __('Berurutan (aktivitas sebelumnya harus selesai)') }}</label>
       <label class="sw cfg" data-for="tugas refleksi"><input type="checkbox" name="allow_upload" value="1" @checked(old('allow_upload', $a->allow_upload))> {{ __('Izinkan unggah dokumen') }}</label>
+      <div class="stack cfg" data-for="tugas refleksi studi_kasus formulir" style="gap:8px;border-top:1px solid var(--line);padding-top:10px">
+        <b style="font-size:13px">{{ __('Batas jawaban (hemat kuota)') }}</b>
+        <label class="sw"><input type="checkbox" name="cfg[allow_paste]" value="1" @checked($c('allow_paste', true))> {{ __('Boleh tempel (copy-paste) teks dari luar') }}</label>
+        <div class="grid g2" style="gap:8px">
+          <div class="field"><label>{{ __('Maks. karakter per isian') }}</label><input type="number" min="0" name="cfg[max_chars]" value="{{ $c('max_chars', 0) }}"><span class="hint">{{ __('0 = tanpa batas') }}</span></div>
+          <div class="field"><label>{{ __('Maks. lama rekaman suara (detik)') }}</label><input type="number" min="0" max="600" name="cfg[max_voice]" value="{{ $c('max_voice', 60) }}"><span class="hint">{{ __('0 = matikan bicara') }}</span></div></div>
+      </div>
       <div class="grid g2" style="gap:8px">
         <div class="field"><label>{{ __('Dibuka') }}</label><input type="datetime-local" name="opens_at" value="{{ old('opens_at', $a->opens_at?->format('Y-m-d\TH:i')) }}"></div>
         <div class="field"><label>{{ __('Ditutup') }}</label><input type="datetime-local" name="closes_at" value="{{ old('closes_at', $a->closes_at?->format('Y-m-d\TH:i')) }}"></div></div>

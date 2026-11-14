@@ -68,7 +68,7 @@
     @endif
     <form method="post" action="{{ route('pes.answer.submit', $a) }}" enctype="multipart/form-data" class="stack" onsubmit="ghoEditorSync('edAns')">@csrf
       <div class="row" style="justify-content:space-between"><h2>{{ $submitted ? __('Perbaiki jawaban') : __('Jawabanmu') }}</h2><span class="chip {{ $a->allow_upload ? 'good' : 'warn' }}">{{ $a->allow_upload ? __('Boleh ketik atau unggah') : __('Wajib ketik langsung') }}</span></div>
-      @include('partials.editor', ['id' => 'edAns', 'name' => 'body', 'html' => $answer->body ?? '', 'upload' => $a->allow_upload, 'save' => route('pes.answer.save', $a)])
+      @include('partials.editor', ['id' => 'edAns', 'name' => 'body', 'html' => $answer->body ?? '', 'upload' => $a->allow_upload, 'save' => route('pes.answer.save', $a), 'limits' => ['paste' => $a->cfg('allow_paste', true), 'chars' => (int) $a->cfg('max_chars', 0), 'voice' => (int) $a->cfg('max_voice', 60)]])
       <div class="row"><button class="btn primary">@ic('send'){{ __('Kirim jawaban') }}</button><span class="faint" style="font-size:12px">{{ __('Setiap perubahan tersimpan otomatis sebagai versi baru.') }}</span></div>
     </form>
     @break
@@ -79,7 +79,7 @@
         <div class="row" style="justify-content:space-between"><h2>{{ __('Studi kasus') }}</h2><div class="rounds" id="crounds"></div></div>
         <div class="chat" id="cchat"></div>
         <div id="cform" class="stack" hidden>
-          <textarea id="cinput" placeholder="{{ __('Tulis keputusan dan alasanmu…') }}"></textarea>
+          <textarea id="cinput" data-paste="{{ $a->cfg('allow_paste', true) ? 1 : 0 }}" data-maxchars="{{ (int) $a->cfg('max_chars', 0) }}" data-maxvoice="{{ (int) $a->cfg('max_voice', 60) }}" @if ((int) $a->cfg('max_chars', 0)) maxlength="{{ (int) $a->cfg('max_chars') }}" @endif placeholder="{{ __('Tulis keputusan dan alasanmu…') }}"></textarea>
           <div class="row"><button class="btn primary" type="button" id="csend">@ic('send'){{ __('Kirim jawaban') }}</button><span class="faint" style="font-size:12px">{{ __('Jawaban disimpan dulu sebelum situasi berikutnya dibuat.') }}</span></div>
         </div>
         <div class="row" id="cstartRow"><button class="btn primary" type="button" id="cstart">@ic('play'){{ $case ? __('Lanjutkan') : __('Mulai studi kasus') }}</button></div>

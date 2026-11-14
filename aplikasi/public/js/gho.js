@@ -414,3 +414,35 @@ function addSpeak(root) {
 }
 document.addEventListener('DOMContentLoaded', () => { addMics(document); addSpeak(document); });
 })();
+
+/* ---------- batas: tempel teks, jumlah karakter, lama rekaman ---------- */
+(function () {
+'use strict';
+const T = k => (window.GHO && GHO.t && GHO.t[k]) || k;
+const en = document.documentElement.lang === 'en';
+const msgPaste = en ? 'Pasting text is turned off for this activity. Please type or speak.' : 'Tempel teks dimatikan untuk aktivitas ini. Silakan ketik atau bicara.';
+function apply(el, cfg) {
+  const len = () => (el.isContentEditable ? el.innerText : el.value).replace(/\s+$/, '').length;
+  if (cfg.paste === '0') {
+    ['paste', 'drop'].forEach(ev => el.addEventListener(ev, e => { e.preventDefault(); e.stopImmediatePropagation(); ghoToast(msgPaste); }, true));
+    el.addEventListener('contextmenu', e => e.preventDefault());
+    el.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) { e.preventDefault(); ghoToast(msgPaste); } });
+  }
+  const max = +cfg.maxchars || 0;
+  if (max) {
+    const lbl = document.createElement('span'); lbl.className = 'faint mono'; lbl.style.fontSize = '12px';
+    const host = el.closest('.ed') ? el.closest('.ed').querySelector('.ed-foot') : el.parentNode; host.appendChild(lbl);
+    const upd = () => { const n = len(); lbl.textContent = n + ' / ' + max; lbl.style.color = n > max ? 'var(--bad)' : ''; };
+    el.addEventListener('beforeinput', e => { if (e.inputType && e.inputType.startsWith('insert') && len() >= max) { e.preventDefault(); ghoToast((en ? 'Maximum ' : 'Maksimal ') + max + (en ? ' characters.' : ' karakter.')); } });
+    el.addEventListener('input', upd); upd();
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.ed[data-paste]').forEach(ed => apply(ed.querySelector('.ed-area'), ed.dataset));
+  document.querySelectorAll('textarea[data-paste], input[data-paste]').forEach(t => apply(t, t.dataset));
+  // lama rekaman: mikrofon berhenti otomatis, 0 = sembunyikan mikrofon
+  document.querySelectorAll('[data-maxvoice]').forEach(h => { const sec = +h.dataset.maxvoice; const scope = h.classList.contains('ed') ? h : h.parentNode;
+    scope.querySelectorAll('.micbtn').forEach(b => { if (sec === 0) { b.hidden = true; return; }
+      b.addEventListener('click', () => { clearTimeout(b._lim); if (b.classList.contains('on') || !sec) return; b._lim = setTimeout(() => { if (b.classList.contains('on')) b.click(); }, sec * 1000); }); }); });
+});
+})();

@@ -68,6 +68,7 @@ class CaseController extends Controller
         $this->own($r, $session);
         $r->validate(['content' => 'required|string|min:5|max:20000']);
         abort_if($session->status !== 'berjalan', 422);
+        if (($max = (int) $session->activity->cfg('max_chars', 0)) && mb_strlen($r->input('content')) > $max) return response()->json(['error' => __('Jawaban maksimal :n karakter.', ['n' => $max])], 422);
         if (! $this->pending($session)) {
             $session->increment('round');
             CaseTurn::create(['case_session_id' => $session->id, 'round' => $session->round, 'role' => 'participant', 'content' => $r->input('content')]);

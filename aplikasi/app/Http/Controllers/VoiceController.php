@@ -13,8 +13,11 @@ class VoiceController extends Controller
         $r->validate(['audio' => 'required|file|max:25600']);
         if (! Voice::enabled()) return response()->json(['error' => 'no_key'], 422);
         try {
+            \App\Services\Quota::check(true);
             $f = $r->file('audio');
-            return response()->json(['text' => Voice::transcribe($f->getRealPath(), $f->getMimeType() ?: 'audio/webm')]);
+            $text = Voice::transcribe($f->getRealPath(), $f->getMimeType() ?: 'audio/webm');
+            \App\Services\Quota::logVoice('suara_teks', (int) $r->input('seconds', 0));
+            return response()->json(['text' => $text]);
         } catch (\Throwable $e) {
             return response()->json(['error' => __('Suara belum bisa diubah menjadi teks.').' '.$e->getMessage()], 422);
         }
@@ -25,7 +28,9 @@ class VoiceController extends Controller
         $r->validate(['text' => 'required|string|max:20000']);
         if (! Voice::enabled()) return response()->json(['error' => 'no_key'], 422);
         try {
+            \App\Services\Quota::check(true);
             $file = Voice::speak(strip_tags($r->input('text')));
+            \App\Services\Quota::logVoice('suara_baca');
             return response()->file(Storage::disk('local')->path($file), ['Content-Type' => 'audio/mpeg']);
         } catch (\Throwable $e) {
             return response()->json(['error' => __('Suara belum bisa dibuat.').' '.$e->getMessage()], 422);

@@ -42,6 +42,11 @@ Gunakan file ini bila kuota satu langganan Claude habis dan pekerjaan dilanjutka
 - Tampilan mudah, kekinian, responsif; navigasi HP maksimal 4 menu + Lainnya.
 - Aplikasi lama yang diadopsi: coach.gho-elearning.com dan Coach Labs (coach-labs.gho-elearning.com). Kredensial tidak disimpan di repo; minta langsung ke pemilik produk bila perlu.
 
+## Selesai sesudah v0.1 (14 Nov siang)
+- Suara: tombol mikrofon di editor dan kolom jawaban (ElevenLabs Scribe, cadangan Web Speech API browser), tombol "Dengarkan" pada materi dan tanggapan (ElevenLabs TTS, cadangan suara browser). Kunci di Pengaturan › WhatsApp & suara. Kode: `app/Services/Voice.php`, `VoiceController`, bagian akhir `public/js/gho.js`. Format API ElevenLabs belum diuji dengan kunci asli.
+- Hemat kuota: batas bulanan dan harian per peserta untuk layanan cerdas dan suara (`app/Services/Quota.php`, dicek di `AiClient::ask`), penghitung di halaman pengaturan. Per aktivitas: boleh/tidak tempel teks, maks. karakter, maks. lama rekaman (0 = mikrofon mati).
+- Pembuat isian/output: tabel `form_templates` dan `documents`, jenis aktivitas `formulir`, pembuat di halaman aktivitas (`public/js/gho-form.js`), pengaturan kertas dan huruf (`app/Support/Page.php`). BELUM: halaman peserta untuk mengisi formulir, penyusunan dokumen, tampilan cetak, templat bawaan.
+
 ## SEDANG DIKERJAKAN: isian dan output dinamis (permintaan 14 Nov, 11.15)
 Pemilik produk ingin isian rancangan TIDAK statis (contoh salah: "Identitas umum" dengan kolom tetap di prototipe). Belum ada kode untuk ini; mulai dari rancangan berikut.
 

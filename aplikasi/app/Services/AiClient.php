@@ -36,6 +36,7 @@ class AiClient
         $p = $this->provider ?? throw new RuntimeException(__('Belum ada penyedia yang diaktifkan. Buka Pengaturan › Penyedia.'));
         $lang = app()->getLocale() === 'en' ? 'Answer in English.' : 'Jawab dalam Bahasa Indonesia.';
         $system = trim($system)."\n".$lang.($json ? "\nKembalikan HANYA JSON yang valid, tanpa teks lain dan tanpa blok kode." : '');
+        Quota::check(false);
         $t0 = microtime(true);
         $in = 0; $out = 0;
         try {

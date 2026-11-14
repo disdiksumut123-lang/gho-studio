@@ -115,6 +115,7 @@ class LearnController extends Controller
         $r->validate($rules);
         $body = Html::clean($r->input('body', ''));
         $text = $this->plain($body);
+        if (($max = (int) $activity->cfg('max_chars', 0)) && mb_strlen($text) > $max) return back()->with('err', __('Jawaban maksimal :n karakter.', ['n' => $max]));
         $min = (int) $activity->cfg('min_chars', 0);
         if (! $r->hasFile('file') && mb_strlen($text) < max(1, $min)) return back()->with('err', $min ? __('Jawaban minimal :n karakter.', ['n' => $min]) : __('Jawaban masih kosong.'));
 

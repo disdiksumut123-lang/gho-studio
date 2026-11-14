@@ -12,7 +12,14 @@ class SettingController extends Controller
     public function index()
     {
         return view('admin.settings', ['gw' => Setting::get('wa_gateway', ''), 'base' => Setting::get('wa_base_url', ''), 'hasToken' => (bool) Setting::get('wa_token'),
-            'hasEl' => (bool) Setting::get('el_key'), 'elVoice' => Setting::get('el_voice', ''), 'elStt' => Setting::get('el_stt_model', ''), 'elTts' => Setting::get('el_tts_model', '')]);
+            'hasEl' => (bool) Setting::get('el_key'), 'elVoice' => Setting::get('el_voice', ''), 'elStt' => Setting::get('el_stt_model', ''), 'elTts' => Setting::get('el_tts_model', ''),
+            'quota' => collect(\App\Services\Quota::KEYS)->mapWithKeys(fn ($l, $k) => [$k => \App\Services\Quota::get($k)])->all(), 'usage' => \App\Services\Quota::usage()]);
+    }
+
+    public function saveQuota(Request $r)
+    {
+        foreach (array_keys(\App\Services\Quota::KEYS) as $k) Setting::put($k, (string) max(0, (int) $r->input($k, 0)));
+        return back()->with('ok', __('Batas pemakaian disimpan.'));
     }
 
     public function saveVoice(Request $r)

@@ -129,6 +129,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/whatsapp', [SettingController::class, 'index'])->name('settings');
         Route::post('/whatsapp', [SettingController::class, 'save'])->name('settings.save');
         Route::post('/suara', [SettingController::class, 'saveVoice'])->name('settings.voice');
+        Route::post('/batas', [SettingController::class, 'saveQuota'])->name('settings.quota');
         Route::post('/pengguna', [UserController::class, 'store'])->name('users.store');
         Route::put('/pengguna/{user}', [UserController::class, 'update'])->name('users.update');
     });
