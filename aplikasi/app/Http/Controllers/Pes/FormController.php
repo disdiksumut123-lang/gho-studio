@@ -48,10 +48,12 @@ class FormController extends Controller
                 'textarea' => Html::clean((string) $v),
                 'checkbox' => array_values(array_map('strval', (array) $v)),
                 'table' => array_values(array_map(fn ($row) => array_map(fn ($c) => mb_substr(strip_tags((string) $c), 0, 2000), (array) $row), (array) $v)),
-                'file' => $v,
+                'file', 'photo' => $v,
+                'signature' => is_string($v) && str_starts_with($v, 'data:image/') ? mb_substr($v, 0, 300000) : null,
+                'narasi' => null, // teks tampilan saja, tidak pernah diisi peserta
                 default => mb_substr(strip_tags((string) $v), 0, 5000),
             };
-            if ($max && is_string($v) && mb_strlen(strip_tags($v)) > $max) $v = mb_substr($v, 0, $max * 2);
+            if ($max && is_string($v) && ($f['type'] ?? '') !== 'signature' && mb_strlen(strip_tags($v)) > $max) $v = mb_substr($v, 0, $max * 2);
             $out[$k] = $v;
         }
         return $out;
@@ -73,7 +75,9 @@ class FormController extends Controller
             'textarea' => trim(html_entity_decode(strip_tags(str_replace(['</p>', '<br>', '</li>'], "\n", (string) $v)))),
             'checkbox' => implode(', ', (array) $v),
             'table' => implode("\n", array_map(fn ($row) => '| '.implode(' | ', (array) $row).' |', (array) $v)),
-            'file' => is_array($v) ? ($v['name'] ?? '') : (string) $v,
+            'file', 'photo' => is_array($v) ? ($v['name'] ?? '') : (string) $v,
+            'signature' => $v ? '(tanda tangan tersimpan)' : '',
+            'narasi' => '',
             default => (string) $v,
         };
     }
@@ -94,13 +98,13 @@ class FormController extends Controller
         $this->guard($r, $activity);
         $vals = array_merge(self::values($activity, $r->user()->id), $this->clean($activity, (array) json_decode((string) $r->input('values', '{}'), true)));
         foreach (self::fields($activity) as $k => $f) {
-            if (($f['type'] ?? '') === 'file' && $r->hasFile('file_'.$k)) {
+            if (in_array($f['type'] ?? '', ['file', 'photo'], true) && $r->hasFile('file_'.$k)) {
                 $r->validate(['file_'.$k => 'file|max:10240|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png']);
                 $file = $r->file('file_'.$k);
                 $vals[$k] = ['path' => $file->store('formulir/'.$activity->id, 'local'), 'name' => $file->getClientOriginalName()];
             }
         }
-        $missing = collect(self::fields($activity))->filter(fn ($f, $k) => ! empty($f['required']) && (($vals[$k] ?? '') === '' || ($vals[$k] ?? null) === [] || trim(strip_tags(is_string($vals[$k] ?? '') ? $vals[$k] : 'x')) === ''))->pluck('label');
+        $missing = collect(self::fields($activity))->filter(fn ($f, $k) => ($f['type'] ?? '') !== 'narasi' && ! empty($f['required']) && (($vals[$k] ?? '') === '' || ($vals[$k] ?? null) === [] || trim(strip_tags(is_string($vals[$k] ?? '') ? $vals[$k] : 'x')) === ''))->pluck('label');
         if ($missing->isNotEmpty()) return back()->with('err', __('Isian wajib belum lengkap: :f', ['f' => $missing->take(5)->implode(', ')]));
         $last = Answer::where(['activity_id' => $activity->id, 'user_id' => $r->user()->id, 'item_key' => 'form'])->max('version');
         $ans = Answer::create(['activity_id' => $activity->id, 'user_id' => $r->user()->id, 'item_key' => 'form', 'body' => json_encode($vals, JSON_UNESCAPED_UNICODE), 'body_text' => $this->plain($activity, $vals), 'version' => (int) $last + 1, 'submitted' => true]);

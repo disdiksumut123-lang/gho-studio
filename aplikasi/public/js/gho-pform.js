@@ -12,10 +12,11 @@ if (f) {
     $$('.pf', f).forEach(p => {
       const k = p.dataset.k, t = p.dataset.type;
       if (t === 'textarea') { const ed = p.querySelector('.ed'); if (ed) { if (window.ghoEditorSync) ghoEditorSync(ed.id); out[k] = ed.querySelector('input[type=hidden]').value; } }
-      else if (t === 'radio') { const c = p.querySelector('input[type=radio]:checked'); out[k] = c ? c.value : ''; }
+      else if (t === 'radio' || t === 'linear_scale') { const c = p.querySelector('input[type=radio]:checked'); out[k] = c ? c.value : ''; }
       else if (t === 'checkbox') out[k] = $$('input[type=checkbox]:checked', p).map(c => c.value);
       else if (t === 'table') out[k] = $$('tbody tr', p).map(tr => $$('input', tr).map(i => i.value)).filter(r => r.some(x => x.trim() !== ''));
-      else if (t !== 'file') { const i = p.querySelector('input,select'); if (i) out[k] = i.value; }
+      else if (t === 'file' || t === 'photo' || t === 'narasi') { /* tidak dikumpulkan sebagai nilai JSON: berkas lewat unggahan, narasi bukan isian */ }
+      else { const i = p.querySelector('input,select'); if (i) out[k] = i.value; }
     });
     return out;
   };
@@ -33,6 +34,21 @@ if (f) {
     if (del) { const tb = del.closest('tbody'); if (tb.rows.length > 1) del.closest('tr').remove(); else $$('input', del.closest('tr')).forEach(i => { i.value = ''; }); later(); }
   });
   f.addEventListener('submit', () => { clearTimeout(timer); document.getElementById('pvalues').value = JSON.stringify(collect()); });
+
+  /* tanda tangan: gambar di kanvas, simpan sebagai data URL di input tersembunyi */
+  $$('.sig-pad', f).forEach(pad => {
+    const cv = pad.querySelector('canvas'), hid = pad.querySelector('input[type=hidden]'), ctx = cv.getContext('2d');
+    ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111';
+    if (hid.value) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0, cv.width, cv.height); img.src = hid.value; }
+    let drawing = false, lx = 0, ly = 0;
+    const pos = e => { const r = cv.getBoundingClientRect(), t = e.touches ? e.touches[0] : e; return [(t.clientX - r.left) * (cv.width / r.width), (t.clientY - r.top) * (cv.height / r.height)]; };
+    const start = e => { e.preventDefault(); drawing = true; [lx, ly] = pos(e); };
+    const move = e => { if (!drawing) return; e.preventDefault(); const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(x, y); ctx.stroke(); [lx, ly] = [x, y]; };
+    const end = () => { if (!drawing) return; drawing = false; hid.value = cv.toDataURL('image/png'); hid.dispatchEvent(new Event('input', {bubbles: true})); };
+    cv.addEventListener('mousedown', start); cv.addEventListener('mousemove', move); addEventListener('mouseup', end);
+    cv.addEventListener('touchstart', start); cv.addEventListener('touchmove', move); cv.addEventListener('touchend', end);
+    pad.querySelector('[data-sig-clear]').addEventListener('click', () => { ctx.clearRect(0, 0, cv.width, cv.height); hid.value = ''; hid.dispatchEvent(new Event('input', {bubbles: true})); });
+  });
 }
 
 /* ---------- halaman dokumen ---------- */

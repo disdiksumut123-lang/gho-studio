@@ -8,7 +8,12 @@ class Page
     public const SIZES = ['A4' => [210, 297], 'A5' => [148, 210], 'F4' => [215, 330], 'Letter' => [216, 279], 'Legal' => [216, 356], 'custom' => null];
     public const FONTS = ['Times New Roman' => '"Times New Roman", Times, serif', 'Arial' => 'Arial, Helvetica, sans-serif', 'Calibri' => 'Calibri, Carlito, sans-serif', 'Cambria' => 'Cambria, Caladea, serif',
         'Georgia' => 'Georgia, serif', 'Bookman Old Style' => '"Bookman Old Style", serif', 'Tahoma' => 'Tahoma, Verdana, sans-serif', 'Plus Jakarta Sans' => '"Plus Jakarta Sans", system-ui, sans-serif'];
-    public const FIELD_TYPES = ['text' => 'Teks pendek', 'textarea' => 'Paragraf (editor lengkap)', 'number' => 'Angka', 'date' => 'Tanggal', 'select' => 'Pilihan (daftar turun)', 'radio' => 'Pilihan (bulatan)', 'checkbox' => 'Centang banyak', 'table' => 'Tabel', 'file' => 'Unggah berkas'];
+    public const FIELD_TYPES = [
+        'text' => 'Teks pendek', 'textarea' => 'Paragraf (editor lengkap)', 'number' => 'Angka', 'date' => 'Tanggal', 'time' => 'Waktu',
+        'select' => 'Pilihan (daftar turun)', 'radio' => 'Pilihan (bulatan)', 'checkbox' => 'Centang banyak', 'linear_scale' => 'Skala linear',
+        'table' => 'Tabel', 'file' => 'Unggah berkas', 'photo' => 'Unggah foto', 'url' => 'Tautan (URL)', 'whatsapp' => 'Nomor WhatsApp',
+        'signature' => 'Tanda tangan', 'narasi' => 'Teks tampilan (bukan isian)',
+    ];
 
     public static function defaults(): array
     {

@@ -49,9 +49,10 @@ window.ghoFormBuilder = {
             <div class="row" style="flex-wrap:nowrap"><select data-f="type" style="width:auto">${Object.entries(T).map(([k, v]) => `<option value="${k}" ${f.type === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>
               <input type="text" data-f="label" value="${esc(f.label)}" placeholder="Label isian" style="flex:1">
               <button type="button" class="btn sm ghost" data-a="fUp">↑</button><button type="button" class="btn sm ghost" data-a="fDown">↓</button><button type="button" class="btn sm ghost" data-a="fDel">✕</button></div>
-            <div class="row" style="flex-wrap:nowrap"><input type="text" data-f="help" value="${esc(f.help || '')}" placeholder="Petunjuk atau contoh jawaban (opsional)" style="flex:1">
-              <label class="sw" style="font-size:12px"><input type="checkbox" data-f="required" ${f.required ? 'checked' : ''}> Wajib</label></div>
+            <div class="row" style="flex-wrap:nowrap"><input type="text" data-f="help" value="${esc(f.help || '')}" placeholder="${f.type === 'narasi' ? 'Isi teks narasi/penjelasan yang akan tampil di sini' : 'Petunjuk atau contoh jawaban (opsional)'}" style="flex:1">
+              ${f.type === 'narasi' ? '' : `<label class="sw" style="font-size:12px"><input type="checkbox" data-f="required" ${f.required ? 'checked' : ''}> Wajib</label>`}</div>
             ${['select', 'radio', 'checkbox'].includes(f.type) ? `<input type="text" data-f="options" value="${esc((f.options || []).join('; '))}" placeholder="Pilihan, pisahkan dengan titik koma (;)">` : ''}
+            ${f.type === 'linear_scale' ? `<input type="text" data-f="options" value="${esc((f.options || []).join('; '))}" placeholder="Minimum; Maksimum; Label kiri; Label kanan — contoh: 1; 5; Sangat tidak setuju; Sangat setuju">` : ''}
             ${f.type === 'table' ? `<input type="text" data-f="columns" value="${esc((f.columns || []).join('; '))}" placeholder="Judul kolom, pisahkan dengan titik koma (;)">` : ''}
             <span class="faint mono" style="font-size:11.5px">Kode untuk output: {${esc(f.key)}}</span>
           </div>`).join('')}</div>

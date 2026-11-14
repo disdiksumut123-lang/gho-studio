@@ -68,6 +68,14 @@ Gunakan file ini bila kuota satu langganan Claude habis dan pekerjaan dilanjutka
 - Kode: `App\Http\Controllers\Fas\ActivityController::payload()` (unggahan dan simpan cfg), `App\Http\Controllers\Pes\LearnController::mediaFile()` + rute `belajar/aktivitas/{activity}/berkas/{field}` (penyaji berkas privat), `resources/views/fas/activity-form.blade.php`, `resources/views/pes/activity.blade.php`.
 - Belum diuji dengan unggahan sungguhan (tanpa composer/database di sandbox ini) — coba unggah satu video dan satu MP3 + sampul begitu terpasang di Hostinger.
 
+## Selesai: jenis isian formulir dinamis diperlengkap, dan jenis/ukuran huruf di editor (14 Nov malam)
+- Permintaan pemilik produk: lengkapi jenis isian formulir seperti contoh tangkapan layar (ada ~17 jenis di aplikasi pembanding), dan lengkapi editor teks dengan pilihan jenis huruf selain ukuran huruf.
+- Jenis isian formulir dinamis bertambah dari 9 jadi 16: `time` (Waktu), `url` (Tautan/URL), `whatsapp` (Nomor WhatsApp), `photo` (Unggah foto — seperti berkas tapi khusus gambar, bisa dari kamera HP), `linear_scale` (Skala linear, mis. 1–5 dengan label kiri/kanan disimpan di `options`), `signature` (Tanda tangan — digambar di kanvas, disimpan sebagai gambar PNG base64 di jawaban), `narasi` (Teks tampilan — bukan isian, hanya menampilkan teks petunjuk/narasi di antara isian lain, memakai kolom "Petunjuk" yang sudah ada).
+- **Belum dikerjakan** (butuh desain lebih lanjut, sengaja dilewati dulu): "Multi Essai" dan "Multi Gambar Deskriptif" (isian berulang/majemuk — perlu struktur data baru), "Dropdown Section" (logika percabangan form — fitur besar tersendiri).
+- Kode: `App\Support\Page::FIELD_TYPES` (daftar jenis), `App\Http\Controllers\Pes\FormController` (bersihkan nilai, render teks utk AI, validasi wajib, unggahan foto), `public/js/gho-form.js` (opsi skala linear, sembunyikan "Wajib" utk narasi), `resources/views/pes/partials/formulir.blade.php` + `public/js/gho-pform.js` (tampilan dan kanvas tanda tangan di sisi peserta).
+- Editor teks (`resources/views/partials/editor.blade.php`, dipakai di semua tempat yang punya editor lengkap) sekarang punya pilihan **jenis huruf** (daftar sama dengan huruf dokumen output) selain ukuran huruf (sekarang 6 tingkat, tadinya 4).
+- Belum diuji dengan database sungguhan — terutama kanvas tanda tangan dan unggahan foto, coba langsung begitu terpasang di Hostinger.
+
 ## Peta jalan
 Daftar lengkap inovasi berprioritas ada di `ROADMAP-INOVASI.md` (permintaan pemilik produk: selengkap-lengkapnya, untuk masa depan).
 

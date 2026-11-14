@@ -33,6 +33,15 @@
             @case('date')
               <input type="date" value="{{ is_scalar($v) ? $v : '' }}" @if ($req) required @endif>
               @break
+            @case('time')
+              <input type="time" value="{{ is_scalar($v) ? $v : '' }}" @if ($req) required @endif>
+              @break
+            @case('url')
+              <input type="url" value="{{ is_scalar($v) ? $v : '' }}" placeholder="https://" @if ($req) required @endif>
+              @break
+            @case('whatsapp')
+              <input type="tel" value="{{ is_scalar($v) ? $v : '' }}" placeholder="08xxxxxxxxxx" pattern="[0-9+ ]{8,16}" @if ($req) required @endif>
+              @break
             @case('select')
               <select @if ($req) required @endif><option value="">{{ __('Pilih…') }}</option>@foreach ($f['options'] ?? [] as $o)<option @selected($v === $o)>{{ $o }}</option>@endforeach</select>
               @break
@@ -41,6 +50,14 @@
               @break
             @case('checkbox')
               @foreach ($f['options'] ?? [] as $o)<label class="opt"><input type="checkbox" value="{{ $o }}" @checked(in_array($o, (array) $v, true))> <span>{{ $o }}</span></label>@endforeach
+              @break
+            @case('linear_scale')
+              @php $sc = $f['options'] ?? []; $min = (int) ($sc[0] ?? 1); $max = (int) ($sc[1] ?? 5); $minL = $sc[2] ?? ''; $maxL = $sc[3] ?? ''; @endphp
+              <div class="row" style="flex-wrap:nowrap;align-items:center;gap:10px">
+                @if ($minL)<span class="faint" style="font-size:.85em">{{ $minL }}</span>@endif
+                @for ($n = $min; $n <= $max; $n++)<label class="opt" style="flex-direction:column;gap:2px"><input type="radio" name="r_{{ $k }}" value="{{ $n }}" @checked((string) $v === (string) $n) @if ($req) required @endif><span>{{ $n }}</span></label>@endfor
+                @if ($maxL)<span class="faint" style="font-size:.85em">{{ $maxL }}</span>@endif
+              </div>
               @break
             @case('table')
               @php $cols = $f['columns'] ?? []; $rows = is_array($v) && $v ? $v : [array_fill(0, max(count($cols), 1), '')]; @endphp
@@ -52,6 +69,19 @@
             @case('file')
               @if (is_array($v) && ! empty($v['name']))<span class="faint" style="font-size:.88em">{{ __('Berkas tersimpan: :n', ['n' => $v['name']]) }}</span>@endif
               <input type="file" name="file_{{ $k }}" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png">
+              @break
+            @case('photo')
+              @if (is_array($v) && ! empty($v['name']))<span class="faint" style="font-size:.88em">{{ __('Foto tersimpan: :n', ['n' => $v['name']]) }}</span>@endif
+              <input type="file" name="file_{{ $k }}" accept="image/*" capture="environment">
+              @break
+            @case('signature')
+              <div class="sig-pad" data-name="f_{{ $k }}">
+                <canvas width="400" height="140" style="width:100%;max-width:400px;height:140px;background:#fff;border:1px dashed var(--line);border-radius:8px;touch-action:none"></canvas>
+                <div class="row" style="margin-top:4px"><button type="button" class="btn sm ghost" data-sig-clear>{{ __('Hapus dan tulis ulang') }}</button></div>
+                <input type="hidden" name="f_{{ $k }}" value="{{ is_string($v) ? $v : '' }}">
+              </div>
+              @break
+            @case('narasi')
               @break
             @default
               <input type="text" value="{{ is_scalar($v) ? $v : '' }}" data-paste="{{ $lim['paste'] ? 1 : 0 }}" @if ($req) required @endif>
