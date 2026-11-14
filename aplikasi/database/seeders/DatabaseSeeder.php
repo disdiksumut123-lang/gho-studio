@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $pass = env('ADMIN_PASSWORD') ?: 'ganti-sandi-ini';
         $admin = User::firstOrCreate(['email' => $email], ['name' => env('ADMIN_NAME') ?: 'Super Admin', 'password' => $pass, 'roles' => ['admin', 'coach', 'fasilitator', 'cms'], 'locale' => 'id']);
 
+        foreach (\App\Support\FormPresets::all() as $tp) \App\Models\FormTemplate::firstOrCreate(['name' => $tp['name']], $tp + ['created_by' => $admin->id]);
+
         if (! env('SEED_SAMPLE', true) || Training::exists()) return;
 
         $t = Training::create(['name' => 'Latsar CPNS Golongan III Angkatan XII (contoh)', 'type' => 'LATSAR', 'sequential' => true, 'created_by' => $admin->id, 'access_mode' => 'setujui']);
@@ -37,5 +39,7 @@ class DatabaseSeeder extends Seeder
         foreach ($qs as $i => [$type, $prompt, $data, $ans]) QuizQuestion::create(['activity_id' => $q->id, 'position' => $i + 1, 'type' => $type, 'prompt' => $prompt, 'data' => $data, 'answer' => $ans]);
         $s2 = $ag->subjects()->create(['name' => 'Akuntabel', 'position' => 2, 'sequential' => true]);
         $s2->activities()->create(['type' => 'refleksi', 'title' => 'Learning journal: akuntabilitas', 'instructions' => '<p>Tulis pengalamanmu tentang akuntabilitas di tempat kerja.</p>', 'config' => [], 'position' => 1, 'sequential' => true, 'required' => true, 'owner_role' => 'coach']);
+        $ra = collect(\App\Support\FormPresets::all())->first()['config'];
+        $s2->activities()->create(['type' => 'formulir', 'title' => 'Rancangan Aktualisasi', 'instructions' => '<p>Isi setiap bagian. Setelah dikirim, tekan <b>Susun</b> untuk menyusun dokumen per bab, lalu sunting dan cetak.</p>', 'config' => $ra + ['allow_paste' => true], 'position' => 2, 'sequential' => true, 'required' => true, 'owner_role' => 'coach']);
     }
 }

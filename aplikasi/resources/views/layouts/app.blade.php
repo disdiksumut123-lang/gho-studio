@@ -49,6 +49,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/gho.css') }}?v=1">
+@stack('head')
 </head>
 <body>
 <div class="app">
@@ -111,7 +112,7 @@
   </nav></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script>window.GHO = {csrf: document.querySelector('meta[name=csrf-token]').content, t: {{ \Illuminate\Support\Js::from(['saving' => __('Menyimpan…'), 'saved' => __('Tersimpan'), 'fail' => __('Gagal menyimpan, coba lagi'), 'words' => __('kata'), 'rec' => __('Merekam… ketuk lagi untuk berhenti'), 'conv' => __('Mengubah suara menjadi teks…'), 'nomic' => __('Mikrofon tidak tersedia di perangkat ini.'), 'listen' => __('Dengarkan'), 'stop' => __('Berhenti'), 'speak' => __('Bicara')]) }}, voice: {{ \Illuminate\Support\Js::from(['server' => \App\Services\Voice::enabled(), 'text' => route('voice.text'), 'speak' => route('voice.speak'), 'lang' => app()->getLocale() === 'en' ? 'en-US' : 'id-ID']) }}};</script>
+<script>window.GHO = {csrf: document.querySelector('meta[name=csrf-token]').content, t: {{ \Illuminate\Support\Js::from(['saving' => __('Menyimpan…'), 'saved' => __('Tersimpan'), 'fail' => __('Gagal menyimpan, coba lagi'), 'words' => __('kata'), 'rec' => __('Merekam… ketuk lagi untuk berhenti'), 'conv' => __('Mengubah suara menjadi teks…'), 'nomic' => __('Mikrofon tidak tersedia di perangkat ini.'), 'listen' => __('Dengarkan'), 'stop' => __('Berhenti'), 'speak' => __('Bicara'), 'composing' => __('Menyusun…'), 'recompose' => __('Susun ulang')]) }}, voice: {{ \Illuminate\Support\Js::from(['server' => \App\Services\Voice::enabled(), 'text' => route('voice.text'), 'speak' => route('voice.speak'), 'lang' => app()->getLocale() === 'en' ? 'en-US' : 'id-ID']) }}};</script>
 <script src="{{ asset('js/gho.js') }}?v=1"></script>
 @stack('scripts')
 </body>

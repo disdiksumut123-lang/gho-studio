@@ -73,6 +73,10 @@
     </form>
     @break
 
+  @case('formulir')
+    @include('pes.partials.formulir', ['vals' => \App\Http\Controllers\Pes\FormController::values($a, auth()->id()), 'doc' => \App\Models\Document::firstWhere(['activity_id' => $a->id, 'user_id' => auth()->id()])])
+    @break
+
   @case('studi_kasus')
     <div class="split">
       <div class="card stack" id="case" data-start="{{ route('pes.case.start', $a) }}" data-session="{{ $case?->id }}" data-answer="{{ url('/belajar/kasus/__ID__/jawab') }}" data-respond="{{ url('/belajar/kasus/__ID__/tanggapan') }}">

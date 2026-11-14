@@ -36,7 +36,10 @@ class CoachController extends Controller
         $q = Feedback::with(['answer.user', 'answer.activity.subject.agenda.training'])
             ->whereHas('answer.activity', fn ($a) => $a->where('owner_role', $role)->whereHas('subject.agenda', fn ($g) => $g->whereIn('training_id', $ids)));
         if ($status !== 'semua') $q->where('status', $status);
-        return view('coach.review', ['items' => $q->latest()->paginate(20)->withQueryString(), 'status' => $status, 'role' => $role]);
+        $docSt = ['semua' => ['draf', 'ditinjau', 'disetujui', 'dikembalikan'], 'approved' => ['disetujui'], 'returned' => ['dikembalikan']][$status] ?? ['draf', 'ditinjau'];
+        $docs = \App\Models\Document::with(['user', 'activity'])->whereNotNull('answer_id')->whereIn('status', $docSt)
+            ->whereHas('activity', fn ($a) => $a->where('owner_role', $role)->whereHas('subject.agenda', fn ($g) => $g->whereIn('training_id', $ids)))->latest('updated_at')->limit(50)->get();
+        return view('coach.review', ['items' => $q->latest()->paginate(20)->withQueryString(), 'status' => $status, 'role' => $role, 'docs' => $docs]);
     }
 
     private function authorizeFeedback(Request $r, Feedback $f): void

@@ -5,6 +5,12 @@
   $base = $role === 'coach' ? 'coach.review' : 'fas.review'; @endphp
 <div class="head"><div><h1>{{ __('Tinjau jawaban') }}</h1><p class="muted">{{ $role === 'coach' ? __('Jawaban pada aktivitas bimbingan coach.') : __('Jawaban pada aktivitas fasilitator.') }}</p></div></div>
 <div class="tabs">@foreach ($tabs as $k => $v)<button type="button" class="{{ $status === $k ? 'on' : '' }}" onclick="location.href='{{ route($base, ['status' => $k]) }}'">{{ $v }}</button>@endforeach</div>
+@if ($docs->isNotEmpty())
+  <div class="card stack"><h2>{{ __('Dokumen formulir') }}</h2>
+    @foreach ($docs as $d)<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:8px"><div><b>{{ $d->user->name }}</b> · {{ $d->activity->title }}<div class="faint" style="font-size:12px">{{ $d->updated_at->translatedFormat('d M H:i') }}</div></div>
+      <div class="row"><span class="chip {{ ['disetujui' => 'good', 'dikembalikan' => 'bad'][$d->status] ?? 'accent' }}">{{ ['draf' => __('Draf'), 'ditinjau' => __('Ditinjau'), 'disetujui' => __('Disetujui'), 'dikembalikan' => __('Dikembalikan')][$d->status] ?? $d->status }}</span><a class="btn sm" href="{{ route('pes.doc', [$d->activity_id, $d->user_id]) }}">{{ __('Buka') }}</a></div></div>@endforeach
+  </div>
+@endif
 @forelse ($items as $f)
   @php $ans = $f->answer; $act = $ans->activity; @endphp
   <div class="card stack">
