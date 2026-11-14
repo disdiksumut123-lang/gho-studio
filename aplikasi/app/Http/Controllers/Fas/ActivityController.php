@@ -19,7 +19,7 @@ class ActivityController extends Controller
         return view('fas.activity-form', ['templates' => \App\Models\FormTemplate::orderBy('name')->get(), 'subject' => $subject, 'a' => new Activity(['type' => $r->get('type', 'tugas'), 'sequential' => true, 'required' => true, 'config' => []])]);
     }
 
-    private function payload(Request $r): array
+    private function payload(Request $r, ?Activity $activity = null): array
     {
         $d = $r->validate([
             'type' => 'required|in:'.implode(',', array_keys(Activity::TYPES)),
@@ -27,6 +27,11 @@ class ActivityController extends Controller
             'instructions' => 'nullable|string|max:200000',
             'opens_at' => 'nullable|date', 'closes_at' => 'nullable|date',
             'cfg' => 'array',
+            'video_url' => 'nullable|url',
+            'audio_url' => 'nullable|url',
+            'cover_file' => 'nullable|image|max:5120',
+            'audio_file' => 'nullable|file|mimes:mp3,wav,m4a,ogg|max:51200',
+            'video_file' => 'nullable|file|mimes:mp4,mov,webm,m4v|max:204800',
         ]);
         $cfg = array_filter($r->input('cfg', []), fn ($v) => $v !== null && $v !== '');
         if ($r->has('cfg.max_voice')) $cfg['max_voice'] = (int) $r->input('cfg.max_voice');
@@ -34,6 +39,19 @@ class ActivityController extends Controller
         $cfg['hold_feedback'] = $r->boolean('cfg.hold_feedback');
         $cfg['allow_paste'] = $r->boolean('cfg.allow_paste');
         foreach (['form', 'output', 'page', 'fonts'] as $j) if (isset($cfg[$j]) && is_string($cfg[$j])) $cfg[$j] = json_decode($cfg[$j], true) ?: [];
+        // Jenis video/audio: tautan atau berkas unggahan langsung masing-masing punya kolom sendiri (bukan cfg[url]) agar tidak tertindih satu sama lain di form yang sama.
+        if ($d['type'] === 'video') {
+            if ($r->hasFile('video_file')) $cfg['url'] = $r->file('video_file')->store('materi/video', 'local');
+            elseif ($d['video_url'] ?? null) $cfg['url'] = $d['video_url'];
+            elseif ($activity && str_starts_with((string) $activity->cfg('url'), 'materi/')) $cfg['url'] = $activity->cfg('url');
+        } elseif ($d['type'] === 'audio') {
+            if ($r->hasFile('audio_file')) $cfg['url'] = $r->file('audio_file')->store('materi/audio', 'local');
+            elseif ($d['audio_url'] ?? null) $cfg['url'] = $d['audio_url'];
+            elseif ($activity && str_starts_with((string) $activity->cfg('url'), 'materi/')) $cfg['url'] = $activity->cfg('url');
+        }
+        if ($r->hasFile('cover_file')) $cfg['cover'] = $r->file('cover_file')->store('materi/sampul', 'local');
+        elseif (! empty($cfg['cover_url'])) { $cfg['cover'] = $cfg['cover_url']; unset($cfg['cover_url']); }
+        elseif ($activity && $activity->cfg('cover')) $cfg['cover'] = $activity->cfg('cover');
         return [
             'type' => $d['type'], 'title' => $d['title'], 'instructions' => Html::clean($d['instructions'] ?? ''),
             'opens_at' => $d['opens_at'] ?? null, 'closes_at' => $d['closes_at'] ?? null, 'config' => $cfg,
@@ -58,7 +76,7 @@ class ActivityController extends Controller
     public function update(Request $r, Activity $activity)
     {
         $this->authorizeTraining($r->user(), $activity->training());
-        $activity->update($this->payload($r));
+        $activity->update($this->payload($r, $activity));
         return back()->with('ok', __('Aktivitas disimpan.'));
     }
 

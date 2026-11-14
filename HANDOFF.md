@@ -61,6 +61,13 @@ Gunakan file ini bila kuota satu langganan Claude habis dan pekerjaan dilanjutka
 - Pembuat aktivitas: pilihan "Ukuran tampilan" pada kartu Media untuk jenis video dan eBook (`resources/views/fas/activity-form.blade.php`).
 - Peserta: kotak video/eBook memakai CSS `aspect-ratio` sesuai pilihan, lebar tetap menyesuaikan layar (`resources/views/pes/activity.blade.php`).
 
+## Selesai: unggah video/MP3 langsung, dan sampul audio tanpa bilah hitam (14 Nov malam)
+- Permintaan pemilik produk: contoh sampul audio (poster BPSDM Sumut, tegak) harus mengisi penuh kotaknya, tanpa bilah hitam di sisi mana pun; mau unggah MP3 sendiri, bukan cuma tautan.
+- Fasilitator sekarang bisa, untuk jenis Video dan Audio, memilih tautan **atau** mengunggah berkas langsung (video_file/audio_file, disimpan di disk privat `local` folder `materi/video` dan `materi/audio`, diputar lewat rute baru `pes.media.file`).
+- Jenis Audio: tambahan "Gambar sampul" (tautan atau unggah gambar, kolom `cfg.cover`), ditampilkan penuh di atas kotak sesuai rasio "Ukuran tampilan" (sekarang berlaku juga untuk audio) dengan `object-fit:cover` — gambar dipotong mengikuti kotak, tidak pernah ada bilah hitam.
+- Kode: `App\Http\Controllers\Fas\ActivityController::payload()` (unggahan dan simpan cfg), `App\Http\Controllers\Pes\LearnController::mediaFile()` + rute `belajar/aktivitas/{activity}/berkas/{field}` (penyaji berkas privat), `resources/views/fas/activity-form.blade.php`, `resources/views/pes/activity.blade.php`.
+- Belum diuji dengan unggahan sungguhan (tanpa composer/database di sandbox ini) — coba unggah satu video dan satu MP3 + sampul begitu terpasang di Hostinger.
+
 ## Peta jalan
 Daftar lengkap inovasi berprioritas ada di `ROADMAP-INOVASI.md` (permintaan pemilik produk: selengkap-lengkapnya, untuk masa depan).
 

@@ -170,6 +170,16 @@ class LearnController extends Controller
         return back()->with('ok', __('Ditandai selesai.'));
     }
 
+    /** Berkas video/audio/sampul yang diunggah langsung (bukan tautan luar), tersimpan di disk privat. */
+    public function mediaFile(Request $r, Activity $activity, string $field)
+    {
+        $this->guard($r, $activity);
+        abort_unless(in_array($field, ['url', 'cover'], true), 404);
+        $path = (string) $activity->cfg($field);
+        abort_unless(str_starts_with($path, 'materi/') && \Illuminate\Support\Facades\Storage::disk('local')->exists($path), 404);
+        return response()->file(\Illuminate\Support\Facades\Storage::disk('local')->path($path));
+    }
+
     /**
      * Kemajuan video/audio/ebook. Video dan audio tidak bisa dilompati:
      * posisi hanya dihitung jika tidak melompat lebih dari 15 detik dari yang sudah ditonton.

@@ -22,13 +22,23 @@
 
   @case('video')
   @case('audio')
-    @php $url = (string) $a->cfg('url'); preg_match('~(?:youtu\.be/|v=|embed/|shorts/)([A-Za-z0-9_-]{11})~', $url, $yt); $frCss = \App\Support\Frame::css((array) $a->cfg('frame', [])); @endphp
+    @php
+      $rawUrl = (string) $a->cfg('url');
+      $url = str_starts_with($rawUrl, 'materi/') ? route('pes.media.file', [$a, 'url']) : $rawUrl;
+      preg_match('~(?:youtu\.be/|v=|embed/|shorts/)([A-Za-z0-9_-]{11})~', $rawUrl, $yt);
+      $frCss = \App\Support\Frame::css((array) $a->cfg('frame', []));
+      $rawCover = (string) $a->cfg('cover');
+      $cover = str_starts_with($rawCover, 'materi/') ? route('pes.media.file', [$a, 'cover']) : $rawCover;
+    @endphp
     <div class="card stack" id="media" data-url="{{ route('pes.media', $a) }}" data-max="{{ $media->max_position ?? 0 }}">
       @if ($a->type === 'video' && ! empty($yt[1]))
         <div class="frame" style="overflow:hidden;aspect-ratio:{{ $frCss }}"><div id="ytp" data-id="{{ $yt[1] }}"></div></div>
       @elseif ($a->type === 'video')
         <video id="mel" class="frame" style="aspect-ratio:{{ $frCss }}" controls controlslist="nodownload noplaybackrate" preload="metadata" src="{{ $url }}"></video>
       @else
+        @if ($cover)
+          <div class="frame" style="overflow:hidden;aspect-ratio:{{ $frCss }};background:#111"><img src="{{ $cover }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+        @endif
         <audio id="mel" controls controlslist="nodownload noplaybackrate" preload="metadata" src="{{ $url }}" style="width:100%"></audio>
       @endif
       <div class="row" style="flex-wrap:nowrap"><div class="bar" style="flex:1"><span id="mbar" style="width:0%"></span></div><span class="mono" id="mpct">0%</span></div>

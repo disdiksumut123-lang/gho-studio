@@ -112,6 +112,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/jawaban/{answer}/berkas', [LearnController::class, 'download'])->name('answer.file');
         Route::post('/aktivitas/{activity}/selesai', [LearnController::class, 'complete'])->name('complete');
         Route::post('/aktivitas/{activity}/kemajuan', [LearnController::class, 'mediaProgress'])->name('media');
+        Route::get('/aktivitas/{activity}/berkas/{field}', [LearnController::class, 'mediaFile'])->name('media.file');
         Route::post('/aktivitas/{activity}/kuis', [LearnController::class, 'submitQuiz'])->name('quiz');
         Route::post('/aktivitas/{activity}/isian', [FormController::class, 'save'])->name('form.save');
         Route::post('/aktivitas/{activity}/isian/kirim', [FormController::class, 'submit'])->name('form.submit');

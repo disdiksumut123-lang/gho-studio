@@ -6,7 +6,7 @@
 <div class="head"><div><h1>{{ $a->exists ? __('Ubah aktivitas') : __('Aktivitas baru') }}</h1><p class="muted">{{ __('Pilih jenis, isi petunjuk, lalu atur aturannya.') }}</p></div>
   @if ($a->exists)<a class="btn" href="{{ route('pes.activity', $a) }}">@ic('play'){{ __('Coba sebagai peserta') }}</a>@endif</div>
 
-<form method="post" action="{{ $a->exists ? route('fas.activity.update', $a) : route('fas.activity.store', $subject) }}" id="actForm" class="split">@csrf @if ($a->exists) @method('put') @endif
+<form method="post" action="{{ $a->exists ? route('fas.activity.update', $a) : route('fas.activity.store', $subject) }}" id="actForm" class="split" enctype="multipart/form-data">@csrf @if ($a->exists) @method('put') @endif
   <div class="stack">
     <div class="card stack">
       <div class="field"><label>{{ __('Jenis aktivitas') }}</label>
@@ -20,20 +20,36 @@
 
     <div class="card stack cfg" data-for="video audio ebook">
       <h3>{{ __('Media') }}</h3>
-      <div class="field"><label>{{ __('Tautan') }}</label><input type="url" name="cfg[url]" value="{{ $c('url') }}" placeholder="https://">
-        <span class="hint" data-for="video">{{ __('Tautan YouTube atau file MP4. Peserta tidak bisa melompat ke bagian yang belum ditonton.') }}</span>
-        <span class="hint" data-for="audio">{{ __('Tautan file MP3. Peserta tidak bisa melompat ke depan.') }}</span>
-        <span class="hint" data-for="ebook">{{ __('Tautan flipbook Heyzine, contoh https://heyzine.com/flip-book/xxxx.html') }}</span></div>
+      <div class="field" data-for="ebook"><label>{{ __('Tautan') }}</label><input type="url" name="cfg[url]" value="{{ $c('url') }}" placeholder="https://">
+        <span class="hint">{{ __('Tautan flipbook Heyzine, contoh https://heyzine.com/flip-book/xxxx.html') }}</span></div>
+      <div class="grid g2" data-for="video">
+        <div class="field"><label>{{ __('Tautan YouTube atau video') }}</label><input type="url" name="video_url" value="{{ $a->type === 'video' && ! str_starts_with((string) $c('url'), 'materi/') ? $c('url') : '' }}" placeholder="https://">
+          <span class="hint">{{ __('Tautan YouTube atau file MP4. Peserta tidak bisa melompat ke bagian yang belum ditonton.') }}</span></div>
+        <div class="field"><label>{{ __('Atau unggah berkas video') }}</label><input type="file" name="video_file" accept="video/*">
+          @if ($a->type === 'video' && str_starts_with((string) $c('url'), 'materi/'))<span class="hint">{{ __('Sudah ada berkas tersimpan. Unggah berkas baru untuk menggantinya.') }}</span>@endif</div>
+      </div>
+      <div class="grid g2" data-for="audio">
+        <div class="field"><label>{{ __('Tautan file MP3') }}</label><input type="url" name="audio_url" value="{{ $a->type === 'audio' && ! str_starts_with((string) $c('url'), 'materi/') ? $c('url') : '' }}" placeholder="https://">
+          <span class="hint">{{ __('Peserta tidak bisa melompat ke depan.') }}</span></div>
+        <div class="field"><label>{{ __('Atau unggah berkas MP3') }}</label><input type="file" name="audio_file" accept="audio/*">
+          @if ($a->type === 'audio' && str_starts_with((string) $c('url'), 'materi/'))<span class="hint">{{ __('Sudah ada berkas tersimpan. Unggah berkas baru untuk menggantinya.') }}</span>@endif</div>
+      </div>
       <div class="grid g2" data-for="ebook">
         <div class="field"><label>{{ __('Jumlah halaman') }}</label><input type="number" min="1" name="cfg[pages]" value="{{ $c('pages', 10) }}"></div>
         <div class="field"><label>{{ __('Minimal detik per halaman') }}</label><input type="number" min="0" name="cfg[seconds_per_page]" value="{{ $c('seconds_per_page', 20) }}"></div></div>
+      <div class="grid g2" data-for="audio">
+        <div class="field"><label>{{ __('Tautan gambar sampul') }}</label><input type="url" name="cfg[cover_url]" value="{{ $c('cover_url') }}" placeholder="https://"></div>
+        <div class="field"><label>{{ __('Atau unggah gambar sampul') }}</label><input type="file" name="cover_file" accept="image/*">
+          @if ($c('cover'))<span class="hint">{{ __('Sudah ada gambar tersimpan. Unggah gambar baru untuk menggantinya.') }}</span>@endif</div>
+      </div>
       @php $fr = array_merge(\App\Support\Frame::defaults(), (array) $a->cfg('frame', [])); $ratioLabels = ['16:9' => '16:9 (' . __('Layar lebar') . ')', '4:3' => '4:3', '1:1' => '1:1 (' . __('Persegi') . ')', '9:16' => '9:16 (' . __('Vertikal') . ')', '21:9' => '21:9 (' . __('Ultra-lebar') . ')', 'custom' => __('Ukuran sendiri (piksel)')]; @endphp
-      <div class="grid g2" data-for="video ebook">
+      <div class="grid g2" data-for="video audio ebook">
         <div class="field"><label>{{ __('Ukuran tampilan') }}</label>
           <select id="frRatio" name="cfg[frame][ratio]">
             @foreach ($ratioLabels as $rv => $rl)<option value="{{ $rv }}" @selected($fr['ratio'] === $rv)>{{ $rl }}</option>@endforeach
           </select>
-          <span class="hint">{{ __('Lebar selalu menyesuaikan layar, tinggi mengikuti rasio ini. Pakai 1920x1080 untuk ukuran layar standar.') }}</span></div>
+          <span class="hint" data-for="video ebook">{{ __('Lebar selalu menyesuaikan layar, tinggi mengikuti rasio ini. Pakai 1920x1080 untuk ukuran layar standar.') }}</span>
+          <span class="hint" data-for="audio">{{ __('Gambar sampul mengisi penuh kotak ini sesuai rasio (dipotong bila perlu), tidak ada bilah hitam di sisinya. Pakai 9:16 untuk sampul tegak seperti poster.') }}</span></div>
         <div class="row" id="frCustom" @if($fr['ratio'] !== 'custom') hidden @endif>
           <div class="field"><label>{{ __('Lebar (px)') }}</label><input type="number" min="1" name="cfg[frame][w]" value="{{ $fr['w'] }}"></div>
           <div class="field"><label>{{ __('Tinggi (px)') }}</label><input type="number" min="1" name="cfg[frame][h]" value="{{ $fr['h'] }}"></div></div>

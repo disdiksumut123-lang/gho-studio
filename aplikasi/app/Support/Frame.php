@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-/** Rasio/ukuran tampilan kotak video dan eBook. Responsif: lebar selalu 100%, tinggi ikut rasio. */
+/** Rasio/ukuran tampilan kotak video, eBook, dan sampul audio. Responsif: lebar selalu 100%, tinggi ikut rasio. */
 class Frame
 {
     public const RATIOS = ['16:9' => [16, 9], '4:3' => [4, 3], '1:1' => [1, 1], '9:16' => [9, 16], '21:9' => [21, 9], 'custom' => null];

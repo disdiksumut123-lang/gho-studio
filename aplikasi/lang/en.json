@@ -652,5 +652,15 @@
     "Persegi": "Square",
     "Vertikal": "Vertical",
     "Ultra-lebar": "Ultra-wide",
-    "Ukuran sendiri (piksel)": "Custom size (pixels)"
+    "Ukuran sendiri (piksel)": "Custom size (pixels)",
+    "Tautan YouTube atau video": "YouTube link or video",
+    "Atau unggah berkas video": "Or upload a video file",
+    "Sudah ada berkas tersimpan. Unggah berkas baru untuk menggantinya.": "A file is already saved. Upload a new file to replace it.",
+    "Tautan file MP3": "MP3 file link",
+    "Atau unggah berkas MP3": "Or upload an MP3 file",
+    "Tautan gambar sampul": "Cover image link",
+    "Atau unggah gambar sampul": "Or upload a cover image",
+    "Sudah ada gambar tersimpan. Unggah gambar baru untuk menggantinya.": "An image is already saved. Upload a new image to replace it.",
+    "Gambar sampul mengisi penuh kotak ini sesuai rasio (dipotong bila perlu), tidak ada bilah hitam di sisinya. Pakai 9:16 untuk sampul tegak seperti poster.": "The cover image fills this box completely at the chosen ratio (cropped if needed), with no black bars on the sides. Use 9:16 for a tall poster-style cover.",
+    "Peserta tidak bisa melompat ke depan.": "Participants can't skip ahead."
 }
