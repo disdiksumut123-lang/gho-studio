@@ -328,3 +328,89 @@ document.addEventListener('DOMContentLoaded', () => {
   mediaTrack(); ebookTrack(); caseFlow();
 });
 })();
+
+/* ---------- suara: bicara jadi teks, dan bacakan teks ---------- */
+(function () {
+'use strict';
+const G = window.GHO || {}, V = G.voice || {}, T = k => (G.t && G.t[k]) || k;
+const MIC = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+let active = null;
+
+function insertInto(target, text) {
+  if (!text) return;
+  if (target.classList && target.classList.contains('ed-area')) {
+    target.focus(); document.execCommand('insertText', false, (target.innerText.trim() ? ' ' : '') + text);
+    target.dispatchEvent(new Event('input', {bubbles: true}));
+  } else {
+    const p = target.selectionStart ?? target.value.length, pre = target.value.slice(0, p);
+    target.value = pre + (pre && !/\s$/.test(pre) ? ' ' : '') + text + target.value.slice(p);
+    target.dispatchEvent(new Event('input', {bubbles: true}));
+  }
+}
+
+function browserRecognize(btn, target) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { ghoToast(T('nomic')); return; }
+  const r = new SR(); r.lang = V.lang || 'id-ID'; r.interimResults = false; r.continuous = true;
+  r.onresult = e => { for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) insertInto(target, e.results[i][0].transcript.trim()); };
+  r.onend = () => { btn.classList.remove('on'); active = null; };
+  r.onerror = () => { btn.classList.remove('on'); active = null; };
+  r.start(); btn.classList.add('on'); ghoToast(T('rec')); active = {stop: () => r.stop()};
+}
+
+async function serverRecognize(btn, target) {
+  if (!navigator.mediaDevices || !window.MediaRecorder) { browserRecognize(btn, target); return; }
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({audio: true}); } catch (e) { ghoToast(T('nomic')); return; }
+  const chunks = [], rec = new MediaRecorder(stream);
+  rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  rec.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop()); btn.classList.remove('on'); active = null;
+    const blob = new Blob(chunks, {type: rec.mimeType || 'audio/webm'}); if (blob.size < 1200) return;
+    ghoToast(T('conv')); btn.disabled = true;
+    const fd = new FormData(); fd.append('audio', blob, 'suara.' + ((rec.mimeType || '').includes('mp4') ? 'mp4' : 'webm'));
+    try {
+      const r = await fetch(V.text, {method: 'POST', headers: {'X-CSRF-TOKEN': G.csrf, 'Accept': 'application/json'}, body: fd}); const j = await r.json();
+      if (j.text) insertInto(target, j.text); else if (j.error === 'no_key') browserRecognize(btn, target); else ghoToast(j.error || 'Error');
+    } catch (e) { ghoToast('Error'); }
+    btn.disabled = false;
+  };
+  rec.start(); btn.classList.add('on'); ghoToast(T('rec')); active = {stop: () => rec.stop()};
+}
+
+function micButton(target) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'micbtn'; b.title = T('speak'); b.setAttribute('aria-label', T('speak')); b.innerHTML = MIC;
+  b.addEventListener('mousedown', e => e.preventDefault());
+  b.addEventListener('click', () => { if (active) { active.stop(); return; } (V.server ? serverRecognize : browserRecognize)(b, target); });
+  return b;
+}
+
+function addMics(root) {
+  // editor lengkap: tombol di bilah alat
+  root.querySelectorAll('.ed').forEach(ed => { if (ed.querySelector('.micbtn')) return; const bar = ed.querySelector('.ed-bar'); if (!bar) return;
+    const gp = document.createElement('div'); gp.className = 'gp'; gp.appendChild(micButton(ed.querySelector('.ed-area'))); bar.appendChild(gp); });
+  // kolom teks biasa untuk jawaban: textarea dan input bertanda data-voice
+  root.querySelectorAll('textarea[data-voice], input[data-voice], #cinput').forEach(t => { if (t.dataset.micDone) return; t.dataset.micDone = 1;
+    const w = document.createElement('div'); w.className = 'micwrap'; t.parentNode.insertBefore(w, t); w.appendChild(t); w.appendChild(micButton(t)); });
+}
+window.ghoAddMics = addMics;
+
+/* bacakan */
+let audio = null;
+async function speak(btn, text) {
+  if (audio) { audio.pause(); audio = null; speechSynthesis && speechSynthesis.cancel(); btn.classList.remove('on'); return; }
+  btn.classList.add('on');
+  const fallback = () => { if (!window.speechSynthesis) { btn.classList.remove('on'); return; } const u = new SpeechSynthesisUtterance(text); u.lang = V.lang || 'id-ID'; u.onend = () => { btn.classList.remove('on'); audio = null; }; speechSynthesis.speak(u); audio = {pause: () => speechSynthesis.cancel()}; };
+  if (!V.server) { fallback(); return; }
+  try {
+    const r = await fetch(V.speak, {method: 'POST', headers: {'X-CSRF-TOKEN': G.csrf, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg,application/json'}, body: JSON.stringify({text})});
+    if (!r.ok) { fallback(); return; }
+    audio = new Audio(URL.createObjectURL(await r.blob())); audio.onended = () => { btn.classList.remove('on'); audio = null; }; audio.play();
+  } catch (e) { fallback(); }
+}
+function addSpeak(root) {
+  root.querySelectorAll('.prose[data-speak], .ai-text[data-speak]').forEach(el => { if (el.dataset.spDone) return; el.dataset.spDone = 1;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn sm ghost spk'; b.innerHTML = '🔊 ' + T('listen');
+    b.addEventListener('click', () => speak(b, el.innerText.replace('🔊 ' + T('listen'), '').trim())); el.parentNode.insertBefore(b, el); });
+}
+document.addEventListener('DOMContentLoaded', () => { addMics(document); addSpeak(document); });
+})();

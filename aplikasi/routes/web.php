@@ -13,6 +13,7 @@ use App\Http\Controllers\Pes\CaseController;
 use App\Http\Controllers\Pes\LearnController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\VoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/bahasa/{loc}', [AuthController::class, 'locale'])->name('locale');
@@ -31,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/keluar', [AuthController::class, 'logout'])->name('logout');
     Route::get('/', [AuthController::class, 'home'])->name('home');
     Route::get('/peran/{role}', [AuthController::class, 'switchRole'])->name('role.switch');
+    Route::post('/suara/teks', [VoiceController::class, 'toText'])->middleware('throttle:30,1')->name('voice.text');
+    Route::post('/suara/baca', [VoiceController::class, 'toSpeech'])->middleware('throttle:30,1')->name('voice.speak');
 
     // Fasilitator
     Route::prefix('fasilitator')->name('fas.')->middleware('role:fasilitator')->group(function () {
@@ -125,6 +128,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengguna', [UserController::class, 'index'])->name('users');
         Route::get('/whatsapp', [SettingController::class, 'index'])->name('settings');
         Route::post('/whatsapp', [SettingController::class, 'save'])->name('settings.save');
+        Route::post('/suara', [SettingController::class, 'saveVoice'])->name('settings.voice');
         Route::post('/pengguna', [UserController::class, 'store'])->name('users.store');
         Route::put('/pengguna/{user}', [UserController::class, 'update'])->name('users.update');
     });

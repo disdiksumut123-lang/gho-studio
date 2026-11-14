@@ -330,3 +330,8 @@ details.box>summary{cursor:pointer;font-weight:700}
 .frame.ebook{aspect-ratio:auto;height:min(75vh,720px);background:var(--surface-2)}
 td.wrap{white-space:normal;min-width:220px}
 [hidden]{display:none!important}
+.micbtn{width:32px;height:30px;border:0;border-radius:7px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;cursor:pointer;flex:none}
+.micbtn.on{background:var(--bad);color:#fff;animation:pulse 1s infinite}
+.micwrap{position:relative;display:flex;gap:6px;align-items:flex-start}
+.micwrap>textarea,.micwrap>input{flex:1}
+.spk{align-self:flex-start}.spk.on{color:var(--bad)}

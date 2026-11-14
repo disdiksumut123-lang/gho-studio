@@ -12,7 +12,7 @@
   </div></div>
 
 @if (trim(strip_tags((string) $a->instructions, '<img>')) !== '' && $a->type !== 'studi_kasus')
-  <div class="card prose">{!! $a->instructions !!}</div>
+  <div class="card stack"><div class="prose" data-speak>{!! $a->instructions !!}</div></div>
 @endif
 
 @switch($a->type)
@@ -55,7 +55,7 @@
         @if ($fb && $fb->status === 'returned')
           <div><span class="chip bad">{{ __('Dikembalikan untuk diperbaiki') }}</span><p style="margin-top:6px" class="ai-text">{{ $fb->reviewer_note }}</p></div>
         @elseif ($showFb)
-          <p class="ai-text">{{ $fb->content }}</p>
+          <p class="ai-text" data-speak>{{ $fb->content }}</p>
           @if ($fb->scores)<div class="stack" style="font-size:13px">@foreach ($fb->scores as $sc)<div class="row" style="flex-wrap:nowrap"><b style="flex:1">{{ $sc['criterion'] ?? '' }}</b><span class="mono">{{ $sc['score'] ?? '' }}</span></div>@if (! empty($sc['reason']))<div class="faint" style="margin-top:-6px">{{ $sc['reason'] }}</div>@endif @endforeach</div>@endif
           @if ($fb->reviewer_note)<p style="font-size:13px"><b>{{ __('Catatan :r:', ['r' => $a->owner_role === 'coach' ? __('coach') : __('fasilitator')]) }}</b> {{ $fb->reviewer_note }}</p>@endif
         @elseif ($fb)

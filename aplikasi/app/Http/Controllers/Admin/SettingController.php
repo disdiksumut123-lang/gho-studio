@@ -11,7 +11,17 @@ class SettingController extends Controller
 {
     public function index()
     {
-        return view('admin.settings', ['gw' => Setting::get('wa_gateway', ''), 'base' => Setting::get('wa_base_url', ''), 'hasToken' => (bool) Setting::get('wa_token')]);
+        return view('admin.settings', ['gw' => Setting::get('wa_gateway', ''), 'base' => Setting::get('wa_base_url', ''), 'hasToken' => (bool) Setting::get('wa_token'),
+            'hasEl' => (bool) Setting::get('el_key'), 'elVoice' => Setting::get('el_voice', ''), 'elStt' => Setting::get('el_stt_model', ''), 'elTts' => Setting::get('el_tts_model', '')]);
+    }
+
+    public function saveVoice(Request $r)
+    {
+        $d = $r->validate(['el_key' => 'nullable|string|max:200', 'el_voice' => 'nullable|string|max:60', 'el_stt_model' => 'nullable|string|max:60', 'el_tts_model' => 'nullable|string|max:60', 'remove' => 'nullable']);
+        if ($r->boolean('remove')) { Setting::put('el_key', null); return back()->with('ok', __('Kunci ElevenLabs dihapus.')); }
+        if (! empty($d['el_key'])) Setting::put('el_key', $d['el_key']);
+        foreach (['el_voice', 'el_stt_model', 'el_tts_model'] as $k) Setting::put($k, $d[$k] ?? null);
+        return back()->with('ok', __('Pengaturan suara disimpan.'));
     }
 
     public function save(Request $r)

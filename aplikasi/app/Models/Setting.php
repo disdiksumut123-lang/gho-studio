@@ -12,7 +12,7 @@ class Setting extends Model
     protected $keyType = 'string';
     public $timestamps = false;
     protected $fillable = ['key', 'value'];
-    private const SECRET = ['wa_token'];
+    private const SECRET = ['wa_token', 'el_key'];
 
     public static function get(string $k, $default = null)
     {
