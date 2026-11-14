@@ -7,6 +7,7 @@ Dashboard widyaiswara dengan tiga area: **Coach**, **Fasilitator**, dan **CMS** 
 | `aplikasi/` | Aplikasi sungguhan (Laravel 13 + MySQL). Cara pasang: `aplikasi/PANDUAN-PASANG-HOSTINGER.md` |
 | `SPESIFIKASI-GHO-STUDIO.md` | Spesifikasi lengkap |
 | `prototipe/gho-studio-prototipe.html` | Prototipe klik (simulasi), buka langsung di browser |
+| `ROADMAP-INOVASI.md` | Peta jalan fitur masa depan, prioritas, dan biaya |
 | `HANDOFF.md` | Catatan serah terima untuk melanjutkan dari akun Claude lain |
 
 ## Yang sudah ada di aplikasi (versi 0.1)

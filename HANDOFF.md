@@ -63,6 +63,9 @@ Rancangan teknis yang disarankan:
 - Tampilan dokumen: halaman HTML dengan CSS `@page { size: <w>mm <h>mm; margin: ... }` dan huruf sesuai pengaturan, tombol Cetak/PDF lewat browser; coach bisa mengedit dan menyetujui per bagian.
 - Pembuat isian/output di `resources/views/fas/activity-form.blade.php` (kartu `.cfg[data-for=formulir]`) dengan JS mirip `ghoQuiz` di `public/js/gho.js`, hasilnya JSON di input tersembunyi `cfg[form]`, `cfg[output]` (ubah `ActivityController::payload` agar men-decode JSON ini).
 
+## Peta jalan
+Daftar lengkap inovasi berprioritas ada di `ROADMAP-INOVASI.md` (permintaan pemilik produk: selengkap-lengkapnya, untuk masa depan).
+
 ## Langkah berikutnya
 - Programmer memasang di Hostinger sesuai panduan, pemilik produk mencoba.
 - Selesaikan isian dan output dinamis di atas (termasuk templat rancangan coach dan cek mutu per bagian).
