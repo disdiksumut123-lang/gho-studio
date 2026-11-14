@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'accepted' => ':attribute harus disetujui.',
+    'after' => ':attribute harus setelah :date.',
+    'after_or_equal' => ':attribute harus sama dengan atau setelah :date.',
+    'array' => ':attribute harus berupa daftar.',
+    'between' => ['numeric' => ':attribute harus antara :min dan :max.', 'string' => ':attribute harus antara :min dan :max karakter.', 'file' => ':attribute harus antara :min dan :max kilobyte.', 'array' => ':attribute harus berisi :min sampai :max item.'],
+    'boolean' => ':attribute harus benar atau salah.',
+    'confirmed' => 'Konfirmasi :attribute tidak cocok.',
+    'date' => ':attribute bukan tanggal yang benar.',
+    'email' => ':attribute harus berupa alamat email yang benar.',
+    'exists' => ':attribute tidak ditemukan.',
+    'file' => ':attribute harus berupa berkas.',
+    'in' => ':attribute tidak valid.',
+    'integer' => ':attribute harus berupa bilangan bulat.',
+    'max' => ['numeric' => ':attribute maksimal :max.', 'string' => ':attribute maksimal :max karakter.', 'file' => ':attribute maksimal :max kilobyte.', 'array' => ':attribute maksimal :max item.'],
+    'mimes' => ':attribute harus berupa berkas: :values.',
+    'mimetypes' => ':attribute harus berupa berkas: :values.',
+    'min' => ['numeric' => ':attribute minimal :min.', 'string' => ':attribute minimal :min karakter.', 'file' => ':attribute minimal :min kilobyte.', 'array' => ':attribute minimal :min item.'],
+    'numeric' => ':attribute harus berupa angka.',
+    'required' => ':attribute wajib diisi.',
+    'required_without' => ':attribute wajib diisi bila :values kosong.',
+    'string' => ':attribute harus berupa teks.',
+    'unique' => ':attribute sudah dipakai.',
+    'url' => 'Format :attribute tidak benar.',
+    'uploaded' => ':attribute gagal diunggah.',
+    'attributes' => [
+        'name' => 'nama', 'email' => 'email', 'password' => 'kata sandi', 'title' => 'judul', 'code' => 'kode', 'whatsapp' => 'nomor WhatsApp',
+        'opens_at' => 'waktu buka', 'closes_at' => 'waktu tutup', 'file' => 'berkas', 'media' => 'media', 'model' => 'model', 'api_key' => 'kunci API',
+        'label' => 'nama', 'material' => 'materi', 'content' => 'isi', 'note' => 'catatan', 'caption' => 'caption', 'goal' => 'tujuan',
+    ],
+];
