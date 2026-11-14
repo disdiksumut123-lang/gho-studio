@@ -535,7 +535,7 @@ const kasusLog = store.get('kasus', []);
 let quizState = {i:0, score:0, answered:false}; let qa = {}; let urutCur = null;
 
 const NAV = {
-  coach:[['coach-beranda','Beranda','home','Utama'],['coach-rancangan','Rancangan','file'],['coach-sesi','Sesi coaching','chat'],['coach-review','Review','inbox'],['coach-milestone','Milestone','flag','Pendampingan'],['coach-jurnal','Learning journal','book'],['coach-lapangan','Lesson learned','map'],['coach-seminar','Latihan seminar','mic'],['coach-kelas','Peserta','users','Kelola']],
+  coach:[['coach-beranda','Beranda','home','Utama'],['coach-rancangan','Rancangan','file'],['coach-formulir','Pembuat formulir','pen'],['coach-sesi','Sesi coaching','chat'],['coach-review','Review','inbox'],['coach-milestone','Milestone','flag','Pendampingan'],['coach-jurnal','Learning journal','book'],['coach-lapangan','Lesson learned','map'],['coach-seminar','Latihan seminar','mic'],['coach-kelas','Peserta','users','Kelola']],
   fas:[['fas-beranda','Beranda','home','Utama'],['fas-struktur','Struktur kelas','layers'],['fas-perancang','Perancang','spark'],['fas-aktivitas','Aktivitas','grid'],['fas-live','Kelas langsung','live'],['fas-studio','Studio materi','book','Perangkat'],['fas-kuis','Kuis','quiz']],
   cms:[['cms-beranda','Beranda','home','Konten'],['cms-terbit','Terbitkan','send'],['cms-kalender','Kalender konten','cal'],['cms-statistik','Statistik','grid'],['cms-akun','Akun terhubung','users','Pengaturan']],
   pes:[['pes-beranda','Tugas saya','home'],['pes-materi','Materi wajib','play'],['pes-rancangan','Rancangan','file'],['pes-tugas','Tugas tulis','pen'],['pes-kasus','Studi kasus','chat'],['pes-kuis','Kuis','quiz'],['pes-jurnal','Jurnal','book']]
@@ -846,29 +846,28 @@ const task = (i,t,s,p,v,b) => `<div class="card stack"><div class="row"><span cl
 const doneParts = () => store.get('parts', [0]).length - 1;
 
 let part = 0;
-V['pes-rancangan'] = () => { const P = LATSAR[part]; const done = store.get('parts',[0]);
+V['pes-rancangan'] = () => { const SEC = fbSecs(); if(part >= SEC.length) part = 0; const P = SEC[part]; const done = store.get('parts',[0]); const FT = fbFonts();
   return `
   ${proto}
   <div class="head"><div><h1>Rancangan Aktualisasi</h1><p class="muted">Jawaban tersimpan otomatis setiap kamu berhenti mengetik. Aman jika internet putus.</p></div></div>
-  <div class="steps">${LATSAR.map((p,i)=>`<button class="step ${i===part?'on':''} ${done.includes(i+1)?'done':''}" onclick="part=${i};render()"><small>${done.includes(i+1)?'✓ ':''}${p.b}</small><b>${p.t}</b></button>`).join('')}</div>
+  <div class="steps">${SEC.map((p,i)=>`<button class="step ${i===part?'on':''} ${done.includes(i+1)?'done':''}" onclick="part=${i};render()"><small>${done.includes(i+1)?'✓ ':''}${p.b}</small><b>${p.t}</b></button>`).join('')}</div>
   <div class="split">
-    <div class="card stack"><div class="label">${P.b}</div><h2>${P.t}</h2>
-      ${P.f.map((f,j)=>{ const id='f'+part+'_'+j; const v = draft[id] ?? f[2];
-        return `<div class="field"><label for="${id}">${f[0]}</label>${f[1]==='area'?`<textarea id="${id}" oninput="saveF(this)">${esc(v)}</textarea>`:`<input type="text" id="${id}" value="${esc(v)}" oninput="saveF(this)">`}</div>`;}).join('')}
+    <div class="card stack" style="font-family:${FONTS[FT.inF]};font-size:${FT.inS}px"><div class="label">${P.b}</div><h2 style="font-family:inherit">${P.t}</h2>
+      ${P.f.map((f,j)=>fbInput(f, 'f'+part+'_'+j)).join('')}
       <div class="row"><button class="btn ai" onclick="cekMutu()">${ic('spark')}Cek mutu</button>
-      <button class="btn primary" onclick="lanjut()">${part<5?'Simpan dan lanjut':'Selesai'}</button></div></div>
+      <button class="btn primary" onclick="lanjut()">${part<SEC.length-1?'Simpan dan lanjut':'Selesai'}</button></div></div>
     <div class="stack">
       <div class="ai-box"><div class="ai-head">${ic('spark')}Cek mutu bagian ini</div><div id="cek" class="faint">Tekan "Cek mutu" untuk mendapat masukan sebelum lanjut.</div></div>
-      ${part===5?`<div class="card stack"><h3>Susun rancangan lengkap</h3><p class="muted" style="font-size:13px">Sistem menyusun 9 output: judul akronim, tujuan, manfaat, fishbone 6M, 5 kegiatan kreatif, tahapan, relevansi Agenda 2 dan 3.</p>
-        <button class="btn ai" onclick="susun()">${ic('spark')}Susun rancangan</button><div id="susun"></div></div>`:''}
+      ${part===SEC.length-1?`<div class="card stack"><h3>Susun rancangan lengkap</h3><p class="muted" style="font-size:13px">Sistem menyusun ${fbOuts().length} bagian output yang diatur coach, di kertas ${fbPage().size} dengan huruf ${FT.outF}.</p>
+        <button class="btn ai" onclick="susun()">${ic('spark')}Susun rancangan</button><button class="btn" onclick="go('pes-dokumen')">${ic('file')}Lihat dokumen</button><div id="susun"></div></div>`:''}
     </div>
   </div>`; };
 window.saveF = el => { draft[el.id] = el.value; store.set('draft', draft); markSaving(); };
-window.lanjut = () => { const d = store.get('parts',[0]); if(!d.includes(part+1)) d.push(part+1); store.set('parts', d); markSaving(); if(part<5){ part++; render(); } else toast('Semua bagian selesai. Coach akan menerima rancanganmu.'); };
+window.lanjut = () => { const d = store.get('parts',[0]); if(!d.includes(part+1)) d.push(part+1); store.set('parts', d); markSaving(); if(part<fbSecs().length-1){ part++; render(); } else toast('Semua bagian selesai. Coach akan menerima rancanganmu.'); };
 window.cekMutu = () => { const el = document.getElementById('cek'); el.classList.remove('faint');
   const val = (document.getElementById('f'+part+'_0')||{}).value || '';
   aiThinking(el, 800, () => {
-    if(LATSAR[part].check==='nfl'){
+    if((fbSecs()[part]||{}).check==='nfl'){
       const neg = /masih|belum|kurang|rendah|lambat|tidak|sering/i.test(val), lok = /\b(di|pada)\b/i.test(val), fok = val.split(' ').length>5;
       el.innerHTML = `<div class="row" style="margin-bottom:10px"><span class="chip ${neg?'good':'bad'}">${neg?'✓':'✗'} Negasi</span><span class="chip ${fok?'good':'bad'}">${fok?'✓':'✗'} Fokus</span><span class="chip ${lok?'good':'bad'}">${lok?'✓':'✗'} Lokus</span></div><p class="ai-text" id="cekt"></p>`;
       stream(document.getElementById('cekt'), lok ? 'Rumusanmu sudah lengkap. Pastikan hanya ada satu masalah dalam kalimat ini dan tidak menyebut solusi.' : 'Lokusnya belum ada. Tambahkan di mana masalah terjadi, misalnya: "…pada Unit Pendaftaran UPT Puskesmas Sukamaju." Negasi dan fokusmu sudah tepat.');
@@ -889,6 +888,105 @@ window.susun = () => { const el = document.getElementById('susun'); el.className
    K5 Laporan perbandingan sebelum–sesudah
 
 …tahapan, relevansi BerAKHLAK, dan Smart ASN lengkap di dokumen Word.`, () => { el.insertAdjacentHTML('afterend', `<button class="btn" style="margin-top:10px" onclick="toast('File .docx dibuat di browser (simulasi)')">${ic('down')}Unduh Word</button>`); })); };
+
+
+/* ---------- pembuat formulir dinamis (isian, output, kertas, huruf) ---------- */
+const FTYPES = [['text','Teks pendek'],['area','Paragraf'],['number','Angka'],['date','Tanggal'],['select','Pilihan (daftar)'],['radio','Pilihan (bulatan)'],['checkbox','Centang banyak'],['table','Tabel'],['file','Unggah berkas']];
+const PAPER = {A4:[210,297],A5:[148,210],F4:[215,330],Letter:[216,279],Legal:[216,356],Bebas:null};
+const FONTS = {'Times New Roman':"'Times New Roman',Times,serif",'Arial':'Arial,Helvetica,sans-serif','Calibri':'Calibri,Carlito,sans-serif','Cambria':'Cambria,Caladea,serif','Georgia':'Georgia,serif','Bookman Old Style':"'Bookman Old Style',serif",'Tahoma':'Tahoma,Verdana,sans-serif','Plus Jakarta Sans':"'Plus Jakarta Sans',system-ui,sans-serif"};
+const OUTS0 = [['BAB I Pendahuluan','Susun latar belakang dari {permasalahan} dan {data}, tujuan, dan manfaat.'],['BAB II Analisis isu','Uraikan {penyebab} dalam fishbone 6M dan tetapkan akar prioritas.'],['BAB III Rencana kegiatan','Buat tabel kegiatan, tahapan, output, dan kaitan nilai BerAKHLAK untuk mencapai {target}.']];
+const fbSecs = () => store.get('fbSecs', null) || LATSAR;
+const fbOuts = () => store.get('fbOuts', null) || OUTS0;
+const fbPage = () => Object.assign({size:'A4', ori:'Tegak', w:210, h:297, mt:30, mr:30, mb:30, ml:40}, store.get('fbPage', {}));
+const fbFonts = () => Object.assign({inF:'Plus Jakarta Sans', inS:14, outF:'Times New Roman', outS:12, hS:14, lh:1.5}, store.get('fbFonts', {}));
+const fbDims = () => { const p = fbPage(); const d = PAPER[p.size] || [+p.w||210, +p.h||297]; return p.ori==='Mendatar' ? [d[1], d[0]] : d; };
+const fbSave = (secs, outs) => { if(secs) store.set('fbSecs', secs); if(outs) store.set('fbOuts', outs); markSaving(); render(); };
+function fbInput(f, id){ const [label, type, val, opts] = f; const v = draft[id] ?? val ?? ''; const o = (opts||'').split(',').map(x=>x.trim()).filter(Boolean);
+  const head = `<label for="${id}">${esc(label)}</label>`;
+  if(type==='area') return `<div class="field">${head}<textarea id="${id}" oninput="saveF(this)">${esc(v)}</textarea></div>`;
+  if(type==='number' || type==='date') return `<div class="field">${head}<input type="${type}" id="${id}" value="${esc(v)}" oninput="saveF(this)"></div>`;
+  if(type==='select') return `<div class="field">${head}<select id="${id}" onchange="saveF(this)"><option value="">Pilih…</option>${o.map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('')}</select></div>`;
+  if(type==='radio' || type==='checkbox') return `<div class="field"><label>${esc(label)}</label><div class="row">${o.map(x=>`<label class="row" style="gap:6px;font-weight:400"><input type="${type}" name="${id}"> ${esc(x)}</label>`).join('')}</div></div>`;
+  if(type==='table') return `<div class="field"><label>${esc(label)}</label><div class="table-wrap"><table><thead><tr>${(o.length?o:['Kolom 1','Kolom 2']).map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${[0,1].map(()=>`<tr>${(o.length?o:[1,2]).map(()=>'<td><input type="text" style="width:100%"></td>').join('')}</tr>`).join('')}</tbody></table></div><button class="btn sm" type="button" onclick="toast('Baris ditambah (simulasi)')">+ Tambah baris</button></div>`;
+  if(type==='file') return `<div class="field">${head}<input type="file" id="${id}"></div>`;
+  return `<div class="field">${head}<input type="text" id="${id}" value="${esc(v)}" oninput="saveF(this)"></div>`; }
+let fbTab = 'isian';
+V['coach-formulir'] = () => { const secs = fbSecs(), outs = fbOuts(), pg = fbPage(), ft = fbFonts(), [W, H] = fbDims();
+  const sel = (val, list, on) => `<select onchange="${on}">${list.map(x=>`<option ${x===val?'selected':''}>${x}</option>`).join('')}</select>`;
+  const num = (val, on, mn, mx, st) => `<input type="number" value="${val}" min="${mn}" max="${mx}" step="${st||1}" onchange="${on}" style="width:84px">`;
+  const isian = secs.map((sc, i) => `<div class="card stack" style="gap:10px">
+      <div class="row" style="flex-wrap:nowrap"><input type="text" value="${esc(sc.t)}" onchange="fbSec(${i},'t',this.value)" style="flex:1;font-weight:700" aria-label="Judul bagian">
+        <button class="btn sm ghost" onclick="fbMoveSec(${i},-1)" aria-label="Naik">↑</button><button class="btn sm ghost" onclick="fbMoveSec(${i},1)" aria-label="Turun">↓</button><button class="btn sm ghost" onclick="fbDelSec(${i})" aria-label="Hapus bagian">✕</button></div>
+      ${sc.f.map((f, j) => `<div class="row" style="flex-wrap:wrap;gap:6px;border:1px solid var(--line);border-radius:10px;padding:8px">
+        <input type="text" value="${esc(f[0])}" onchange="fbField(${i},${j},0,this.value)" style="flex:2;min-width:160px" aria-label="Label isian">
+        <select onchange="fbField(${i},${j},1,this.value)" style="flex:1;min-width:130px">${FTYPES.map(t=>`<option value="${t[0]}" ${t[0]===f[1]?'selected':''}>${t[1]}</option>`).join('')}</select>
+        ${['select','radio','checkbox','table'].includes(f[1]) ? `<input type="text" placeholder="${f[1]==='table'?'Kolom, dipisah koma':'Pilihan, dipisah koma'}" value="${esc(f[3]||'')}" onchange="fbField(${i},${j},3,this.value)" style="flex:2;min-width:160px">` : ''}
+        <span class="mono faint" style="font-size:11px">{${fbKey(f[0])}}</span>
+        <button class="btn sm ghost" onclick="fbMoveField(${i},${j},-1)" aria-label="Naik">↑</button><button class="btn sm ghost" onclick="fbMoveField(${i},${j},1)" aria-label="Turun">↓</button><button class="btn sm ghost" onclick="fbDelField(${i},${j})" aria-label="Hapus isian">✕</button></div>`).join('')}
+      <div><button class="btn sm" onclick="fbAddField(${i})">+ Tambah isian</button></div></div>`).join('');
+  const output = outs.map((o, i) => `<div class="card stack" style="gap:8px"><div class="row" style="flex-wrap:nowrap"><input type="text" value="${esc(o[0])}" onchange="fbOut(${i},0,this.value)" style="flex:1;font-weight:700" aria-label="Judul output">
+      <button class="btn sm ghost" onclick="fbMoveOut(${i},-1)" aria-label="Naik">↑</button><button class="btn sm ghost" onclick="fbMoveOut(${i},1)" aria-label="Turun">↓</button><button class="btn sm ghost" onclick="fbDelOut(${i})" aria-label="Hapus output">✕</button></div>
+      <textarea onchange="fbOut(${i},1,this.value)" style="min-height:70px" aria-label="Perintah penyusunan">${esc(o[1])}</textarea></div>`).join('');
+  const halaman = `<div class="card stack"><h3>Templat halaman</h3>
+      <div class="grid g2"><div class="field"><label>Ukuran kertas</label>${sel(pg.size, Object.keys(PAPER), "fbPg('size',this.value)")}</div><div class="field"><label>Orientasi</label>${sel(pg.ori, ['Tegak','Mendatar'], "fbPg('ori',this.value)")}</div></div>
+      ${pg.size==='Bebas'?`<div class="row"><div class="field"><label>Lebar (mm)</label>${num(pg.w,"fbPg('w',this.value)",50,600)}</div><div class="field"><label>Tinggi (mm)</label>${num(pg.h,"fbPg('h',this.value)",50,900)}</div></div>`:''}
+      <div class="row">${[['mt','Atas'],['mr','Kanan'],['mb','Bawah'],['ml','Kiri']].map(m=>`<div class="field"><label>Margin ${m[1]}</label>${num(pg[m[0]],`fbPg('${m[0]}',this.value)`,0,80)}</div>`).join('')}</div></div>
+    <div class="card stack"><h3>Huruf</h3>
+      <div class="grid g2"><div class="field"><label>Huruf isian peserta</label>${sel(ft.inF, Object.keys(FONTS), "fbFt('inF',this.value)")}</div><div class="field"><label>Ukuran (px)</label>${num(ft.inS,"fbFt('inS',this.value)",10,24)}</div>
+      <div class="field"><label>Huruf output</label>${sel(ft.outF, Object.keys(FONTS), "fbFt('outF',this.value)")}</div><div class="field"><label>Ukuran (pt)</label>${num(ft.outS,"fbFt('outS',this.value)",8,20,.5)}</div>
+      <div class="field"><label>Ukuran judul (pt)</label>${num(ft.hS,"fbFt('hS',this.value)",8,28,.5)}</div><div class="field"><label>Spasi baris</label>${num(ft.lh,"fbFt('lh',this.value)",1,3,.05)}</div></div></div>`;
+  const sc = 250 / (W * 3.78);
+  return `${proto}
+  <div class="head"><div><h1>Pembuat formulir</h1><p class="muted">Isian peserta dan output dokumen tidak statis. Tambah, hapus, urutkan, lalu atur kertas dan huruf.</p></div>
+    <div class="row"><select onchange="if(this.value){fbTpl(this.value);this.value=''}"><option value="">Pakai templat…</option>${['Rancangan Aktualisasi (Latsar)','Aksi Perubahan (PKP/PKA)','Rancangan Proyek Perubahan (PKN Tingkat II)','Learning journal','Lesson learned studi lapangan'].map(t=>`<option>${t}</option>`).join('')}</select>
+    <button class="btn" onclick="toast('Disimpan sebagai templat (simulasi)')">Simpan sebagai templat</button><button class="btn ghost" onclick="fbReset()">Kembalikan awal</button></div></div>
+  <div class="tabs">${[['isian','Isian peserta ('+secs.reduce((n,s)=>n+s.f.length,0)+')'],['output','Output ('+outs.length+')'],['halaman','Kertas dan huruf']].map(t=>`<button class="${fbTab===t[0]?'on':''}" onclick="fbTab='${t[0]}';render()">${t[1]}</button>`).join('')}</div>
+  <div class="split">
+    <div class="stack">${fbTab==='isian' ? isian + `<div><button class="btn primary" onclick="fbAddSec()">+ Tambah bagian isian</button></div>`
+      : fbTab==='output' ? `<div class="ai-box"><div class="ai-head">${ic('spark')}Cara kerja</div><div style="font-size:13px">Setiap bagian output disusun dari isian peserta mengikuti perintahnya. Tulis kode isian seperti <span class="mono">{permasalahan}</span> agar jawaban peserta dipakai.</div></div>` + output + `<div><button class="btn primary" onclick="fbAddOut()">+ Tambah bagian output</button></div>`
+      : halaman}</div>
+    <div class="stack"><div class="card stack"><div class="row" style="justify-content:space-between"><h3>Pratinjau ${PAPER[pg.size]?pg.size:W+'×'+H+' mm'} ${pg.ori.toLowerCase()}</h3><button class="btn sm" onclick="S.view.pes='pes-dokumen';setRole('pes')">Lihat sebagai peserta</button></div>
+      <div style="background:var(--surface-2);border-radius:10px;padding:14px;overflow:hidden"><div style="width:${W*sc}mm;height:${H*sc}mm;margin:0 auto;background:#fff;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.15);padding:${pg.mt*sc}mm ${pg.mr*sc}mm ${pg.mb*sc}mm ${pg.ml*sc}mm;font-family:${FONTS[ft.outF]};font-size:${ft.outS*sc}pt;line-height:${ft.lh};overflow:hidden">
+        <div style="text-align:center;font-weight:700;font-size:${(+ft.hS+2)*sc}pt">Rancangan Aktualisasi</div>
+        ${outs.map(o=>`<div style="font-weight:700;font-size:${ft.hS*sc}pt;margin-top:3mm">${esc(o[0])}</div><div>Lorem isi bagian disusun dari isian peserta…</div>`).join('')}</div></div>
+      <div class="faint" style="font-size:12px">Ukuran dan margin sesuai kertas sungguhan saat dicetak atau disimpan PDF.</div></div></div>
+  </div>`; };
+const fbKey = l => String(l).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,24) || 'isian';
+const clone = x => JSON.parse(JSON.stringify(x));
+window.fbSec = (i, k, v) => { const s = clone(fbSecs()); s[i][k] = v; fbSave(s); };
+window.fbAddSec = () => { const s = clone(fbSecs()); s.push({b:'Bagian '+(s.length+1), t:'Bagian baru', f:[['Isian baru','text','']]}); fbSave(s); };
+window.fbDelSec = i => { const s = clone(fbSecs()); if(s.length<2) return toast('Minimal satu bagian.'); if(!confirm('Hapus bagian "'+s[i].t+'"?')) return; s.splice(i,1); s.forEach((x,n)=>x.b='Bagian '+(n+1)); fbSave(s); };
+window.fbMoveSec = (i, d) => { const s = clone(fbSecs()), j = i+d; if(j<0||j>=s.length) return; [s[i], s[j]] = [s[j], s[i]]; s.forEach((x,n)=>x.b='Bagian '+(n+1)); fbSave(s); };
+window.fbField = (i, j, k, v) => { const s = clone(fbSecs()); s[i].f[j][k] = v; fbSave(s); };
+window.fbAddField = i => { const s = clone(fbSecs()); s[i].f.push(['Isian baru','text','']); fbSave(s); };
+window.fbDelField = (i, j) => { const s = clone(fbSecs()); s[i].f.splice(j,1); fbSave(s); };
+window.fbMoveField = (i, j, d) => { const s = clone(fbSecs()), f = s[i].f, k = j+d; if(k<0||k>=f.length) return; [f[j], f[k]] = [f[k], f[j]]; fbSave(s); };
+window.fbOut = (i, k, v) => { const o = clone(fbOuts()); o[i][k] = v; fbSave(null, o); };
+window.fbAddOut = () => { const o = clone(fbOuts()); o.push(['Bagian output baru','Tulis perintah penyusunan, pakai kode isian seperti {permasalahan}.']); fbSave(null, o); };
+window.fbDelOut = i => { const o = clone(fbOuts()); o.splice(i,1); fbSave(null, o); };
+window.fbMoveOut = (i, d) => { const o = clone(fbOuts()), j = i+d; if(j<0||j>=o.length) return; [o[i], o[j]] = [o[j], o[i]]; fbSave(null, o); };
+window.fbPg = (k, v) => { store.set('fbPage', Object.assign(store.get('fbPage', {}), {[k]: v})); render(); };
+window.fbFt = (k, v) => { store.set('fbFonts', Object.assign(store.get('fbFonts', {}), {[k]: v})); render(); };
+window.fbReset = () => { ['fbSecs','fbOuts','fbPage','fbFonts'].forEach(k=>store.set(k, null)); store.set('fbPage', {}); store.set('fbFonts', {}); part = 0; toast('Kembali ke formulir awal.'); render(); };
+window.fbTpl = name => { if(!confirm('Ganti isian dan output dengan templat "'+name+'"?')) return;
+  const T = {
+    'Aksi Perubahan (PKP/PKA)': [[{b:'Bagian 1',t:'Identitas',f:[['Nama lengkap','text',''],['Jabatan','text',''],['Unit kerja','text','']]},{b:'Bagian 2',t:'Gagasan perubahan',f:[['Judul aksi perubahan','text',''],['Area perubahan','select','','Pelayanan publik, Tata kelola, SDM, Teknologi informasi'],['Latar belakang','area','']]},{b:'Bagian 3',t:'Tata kelola',f:[['Tim efektif','table','','Nama, Peran, Tugas'],['Pemangku kepentingan','table','','Pihak, Kepentingan, Pengaruh, Strategi']]}],[['BAB I Pendahuluan','Susun latar belakang {latar_belakang} dan judul {judul_aksi_perubahan}.'],['BAB II Tata kelola','Uraikan {tim_efektif} dan {pemangku_kepentingan}.'],['BAB III Milestone','Buat tabel milestone jangka pendek.'],['BAB IV Manajemen risiko','Uraikan risiko dan mitigasinya.']]],
+    'Rancangan Proyek Perubahan (PKN Tingkat II)': [[{b:'Bagian 1',t:'Identitas',f:[['Nama lengkap','text',''],['Jabatan','text','']]},{b:'Bagian 2',t:'Proyek perubahan',f:[['Judul proyek','text',''],['Diagnosa organisasi','area',''],['Indikator keberhasilan','table','','Indikator, Kondisi awal, Target']]}],[['BAB I Pendahuluan','Susun dari {diagnosa_organisasi} dan {judul_proyek}.'],['BAB II Ukuran keberhasilan','Sajikan {indikator_keberhasilan}.'],['BAB III Tata kelola','Uraikan pemangku kepentingan dan tahapan.']]],
+    'Learning journal': [[{b:'Bagian 1',t:'Jurnal belajar',f:[['Topik','text',''],['Tanggal','date',''],['Apa yang saya pelajari','area',''],['Bagaimana saya menerapkannya','area','']]}],[['Learning journal','Rangkai {apa_yang_saya_pelajari} dan {bagaimana_saya_menerapkannya} menjadi jurnal reflektif.']]],
+    'Lesson learned studi lapangan': [[{b:'Bagian 1',t:'Studi lapangan',f:[['Lokus kunjungan','text',''],['Praktik baik','area',''],['Yang bisa diadopsi','area',''],['Foto dokumentasi','file','']]}],[['Temuan praktik baik','Uraikan {praktik_baik} di {lokus_kunjungan}.'],['Rencana adopsi','Susun rencana dari {yang_bisa_diadopsi}.']]]
+  }[name];
+  if(!T){ store.set('fbSecs', null); store.set('fbOuts', null); } else { store.set('fbSecs', T[0]); store.set('fbOuts', T[1]); }
+  if(name==='Learning journal') store.set('fbPage', {size:'A5', mt:20, mr:20, mb:20, ml:25});
+  part = 0; toast('Templat dimuat. Periksa lalu simpan.'); render(); };
+V['pes-dokumen'] = () => { const outs = fbOuts(), pg = fbPage(), ft = fbFonts(), [W, H] = fbDims();
+  return `${proto}<div class="head"><div><h1>Dokumen rancangan</h1><p class="muted">Kertas ${PAPER[pg.size]?pg.size:W+'×'+H+' mm'} ${pg.ori.toLowerCase()} · huruf ${ft.outF} ${ft.outS} pt. Setiap bagian bisa disusun ulang dan disunting langsung.</p></div>
+    <div class="row"><button class="btn ai" onclick="document.querySelectorAll('.dsusun').forEach(b=>b.click())">${ic('spark')}Susun semua bagian</button><button class="btn" onclick="print()">${ic('down')}Cetak / simpan PDF</button></div></div>
+  <div style="overflow-x:auto"><div style="background:#fff;color:#111;width:${W}mm;max-width:100%;min-height:${H}mm;margin:0 auto;box-shadow:0 2px 18px rgba(0,0,0,.12);padding:${pg.mt}mm ${pg.mr}mm ${pg.mb}mm ${pg.ml}mm;font-family:${FONTS[ft.outF]};font-size:${ft.outS}pt;line-height:${ft.lh}" class="docpaper">
+    <div style="text-align:center;font-weight:700;font-size:${+ft.hS+2}pt">Rancangan Aktualisasi</div><div style="text-align:center;margin-bottom:8mm">Nur Aulia Siregar · UPT Puskesmas Sukamaju</div>
+    ${outs.map((o,i)=>`<div class="row" style="justify-content:space-between;margin-top:6mm"><b style="font-size:${ft.hS}pt">${esc(o[0])}</b><button class="btn sm ai dsusun" style="font-family:'Plus Jakarta Sans',sans-serif" onclick="dSusun(${i})">${ic('spark')}Susun</button></div>
+      <div id="dsec${i}" contenteditable="true" style="outline:none"><p style="color:#999;font-style:italic">Belum disusun.</p></div>`).join('')}
+  </div></div>`; };
+window.dSusun = i => { const el = document.getElementById('dsec'+i); const o = fbOuts()[i]; aiThinking(el, 700, () => { el.innerHTML = '<p></p>'; stream(el.firstChild, 'Bagian "'+o[0]+'" disusun dari isian peserta sesuai perintah: '+o[1].replace(/\{(\w+)\}/g, (m, k) => '«'+k.replace(/_/g,' ')+'»')+' Teks ini bisa disunting langsung sebelum dicetak.'); }); };
 
 V['pes-kasus'] = () => { const mine = kasusLog.filter(x=>x.r==='me').length; const finished = mine>=3;
   return `
@@ -981,7 +1079,7 @@ window.periksa = () => { const k = KUIS2[quizState.i]; let ok = false;
 const JENIS = {latsar:'Rancangan Aktualisasi', pkp:'Rancangan Aksi Perubahan', pka:'Rancangan Aksi Perubahan', pkn:'Rancangan Proyek Perubahan'};
 let rkI = 0;
 V['coach-rancangan'] = () => `
-  <div class="head"><div><h1>Rancangan peserta</h1><p class="muted">Rancangan Aktualisasi (Latsar), Aksi Perubahan (PKP, PKA), dan Proyek Perubahan (PKN Tk II). Hasil cek mutu terlihat per bagian.</p></div></div>
+  <div class="head"><div><h1>Rancangan peserta</h1><p class="muted">Rancangan Aktualisasi (Latsar), Aksi Perubahan (PKP, PKA), dan Proyek Perubahan (PKN Tk II). Hasil cek mutu terlihat per bagian.</p></div><button class="btn primary" onclick="go('coach-formulir')">${ic('pen')}Atur isian dan output</button></div>
   <div class="tabs">${KELAS.map((k,i)=>`<button class="${i===rkI?'on':''}" onclick="rkI=${i};render()">${k.pel} · ${JENIS[k.id].replace('Rancangan ','')}</button>`).join('')}</div>
   <div class="card pad0"><div class="table-wrap"><table>
     <thead><tr><th>Peserta</th><th>Judul (akronim)</th><th>Bagian</th><th>Cek mutu</th><th>Status</th><th></th></tr></thead>

@@ -19,11 +19,11 @@ Status: ✓ sudah ada di aplikasi v0.1 · ◐ sebagian · ○ belum
 
 | # | Fitur | Manfaat | Biaya | Status |
 |---|---|---|---|---|
-| B1 | **Isian dan output dinamis** dengan templat kertas dan huruf | Semua bentuk rancangan bisa dibuat sendiri | Kuota layanan cerdas | ◐ (sedang dibangun) |
+| B1 | **Isian dan output dinamis** dengan templat kertas dan huruf | Semua bentuk rancangan bisa dibuat sendiri | Kuota layanan cerdas | ✓ (cek mutu per bagian dan unduh Word menyusul) |
 | B2 | **Tutor pendamping per modul**: peserta bertanya, jawaban hanya bersumber dari materi modul | Belajar mandiri 24 jam | Kuota layanan cerdas | ○ |
 | B3 | **Peringatan dini peserta berisiko**: tidak aktif 3 hari, nilai turun, tenggat terlewat → notifikasi ke coach/fasilitator + saran tindakan | Tidak ada peserta tertinggal | Kuota layanan cerdas (ringan) | ○ |
 | B4 | **Cek orisinalitas**: kemiripan antar jawaban peserta satu angkatan dan indikasi teks hasil mesin | Menjaga kejujuran akademik | Gratis (antar peserta); layanan luar berbayar untuk cek internet | ○ |
-| B5 | **Pembaca suara** materi dan tanggapan (teks ke suara) | Belajar sambil berkendara, ramah tunanetra | Gratis (suara browser); suara alami berbayar | ○ |
+| B5 | **Pembaca suara** materi dan tanggapan (teks ke suara) | Belajar sambil berkendara, ramah tunanetra | Gratis (suara browser); suara alami berbayar | ✓ (ElevenLabs atau suara browser, juga bicara jadi teks) |
 | B6 | **Gladi seminar dengan penguji simulasi** dan nilai kesiapan | Peserta percaya diri | Kuota layanan cerdas | ○ |
 | B7 | **Kuis langsung berwaktu** di kelas (seperti kuis interaktif), papan skor real-time | Kelas lebih hidup | Gratis (polling tiap 2 detik, tanpa server khusus) | ○ |
 | B8 | **Bentuk kuis tambahan**: berbasis gambar, PG beralasan, skala sikap | Penilaian lebih kaya | Gratis | ○ |
@@ -65,7 +65,7 @@ Status: ✓ sudah ada di aplikasi v0.1 · ◐ sebagian · ○ belum
 | E8 | **CMS penuh**: terbit otomatis ke YouTube, Facebook, Instagram, TikTok; statistik tayangan | Publikasi satu pintu | Gratis, perlu persetujuan aplikasi resmi tiap platform | ◐ |
 
 ## Urutan pengerjaan yang disarankan
-1. B1 (sedang berjalan), A1, A2, A3, A4.
+1. A1, A2, A3, A4 (B1 selesai).
 2. D2 sertifikat QR, D1 presensi QR, D4 notifikasi, B3 peringatan dini.
 3. C1–C4 fitur coach, B6 gladi seminar, B8 kuis tambahan, B7 kuis langsung.
 4. E1 PWA, D3 gamifikasi, B2 tutor modul, B5 pembaca suara, B4 cek orisinalitas.
